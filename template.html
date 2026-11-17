@@ -3,6 +3,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Assistant:wght@400;600;700&family=Rubik:wght@500;700&display=swap">
 <style>
+/* Layout: a control strip on top, then a ranked list of companies (rows on desktop, cards on phones), each row opens a 20-year premium chart */
 :root{
   --bg:#F3F6F7; --surface:#FFFFFF; --ink:#14213A; --muted:#566377; --line:#D9E0E6;
   --accent:#0E7466; --accent-soft:#E2F2EF; --gold:#9A6512; --gold-soft:#FBF0DC; --bar:#C5CFD9;
@@ -15,11 +16,12 @@
   --bg:#0E151E; --surface:#16202C; --ink:#E6ECF2; --muted:#9BA8B8; --line:#263444;
   --accent:#3CC3AE; --accent-soft:#16352F; --gold:#E3AE55; --gold-soft:#3A2D16; --bar:#3A4A5C; color-scheme:dark}
 *{box-sizing:border-box}
-body{background:var(--bg);color:var(--ink);font-family:var(--font-body);font-size:16px;line-height:1.5;margin:0}
+body{background:var(--bg);color:var(--ink);font-family:var(--font-body);font-size:16px;line-height:1.5}
 .wrap{max-width:1080px;margin:0 auto;padding-block:28px 48px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
 h1{font-family:var(--font-display);font-weight:700;font-size:clamp(1.7rem,4vw,2.4rem);margin:0;text-wrap:balance;letter-spacing:-.01em}
 .lede{color:var(--muted);margin:6px 0 0;max-width:62ch}
 .num{font-variant-numeric:tabular-nums}
+/* controls */
 .controls{margin-top:22px;background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:16px;display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:16px 20px}
 .field{display:flex;flex-direction:column;gap:6px;min-width:0}
 .field>span{font-size:.85rem;color:var(--muted);font-weight:600}
@@ -28,15 +30,21 @@ h1{font-family:var(--font-display);font-weight:700;font-size:clamp(1.7rem,4vw,2.
 .seg button+button{border-inline-start:1px solid var(--line)}
 .seg button[aria-pressed="true"]{background:var(--ink);color:var(--surface);font-weight:700}
 select,input[type=number]{font:inherit;color:var(--ink);background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:8px 10px;width:100%}
+.ages{display:flex;flex-wrap:wrap;gap:6px}
+.ages button{border:1px solid var(--line);background:transparent;color:var(--ink);font:inherit;border-radius:999px;padding:4px 11px;cursor:pointer;font-variant-numeric:tabular-nums}
+.ages button[aria-pressed="true"]{background:var(--accent);border-color:var(--accent);color:var(--surface);font-weight:700}
+
 .presets{display:flex;gap:6px;flex-wrap:wrap}
 .presets button{border:1px dashed var(--line);background:transparent;color:var(--muted);font:inherit;font-size:.85rem;border-radius:8px;padding:2px 8px;cursor:pointer}
 button:focus-visible,select:focus-visible,input:focus-visible,summary:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+/* top bar, tabs, theme */
 .top{display:flex;justify-content:space-between;align-items:flex-start;gap:12px}
 .theme{flex:none;border:1px solid var(--line);background:var(--surface);color:var(--ink);font:inherit;font-size:.9rem;border-radius:999px;padding:6px 14px;cursor:pointer}
 .tabs{display:flex;gap:8px;margin-top:20px}
 .tabs button{border:1px solid var(--line);background:transparent;color:var(--ink);font:inherit;font-weight:600;border-radius:10px;padding:8px 16px;cursor:pointer}
 .tabs button[aria-pressed="true"]{background:var(--ink);color:var(--surface)}
 .hide{display:none!important}
+/* landing */
 .hero{margin-top:30px;display:grid;grid-template-columns:1.15fr .85fr;gap:28px;align-items:start}
 .hero h2{font-family:var(--font-display);font-size:clamp(2rem,5vw,3.1rem);line-height:1.12;margin:0;text-wrap:balance;letter-spacing:-.02em}
 .hero .sub{color:var(--muted);font-size:1.1rem;max-width:46ch;margin:14px 0 0}
@@ -65,6 +73,7 @@ table.t td small{display:block}
 .ytab th,.ytab td{padding:5px 10px;text-align:center;border-bottom:1px solid var(--line);white-space:nowrap}
 .ytab thead th{position:sticky;top:0;background:var(--surface);color:var(--muted);font-size:.78rem}
 @media (max-width:760px){.hero{grid-template-columns:1fr}}
+/* matrix */
 .mwrap{margin-top:14px;border:1px solid var(--line);border-radius:12px;background:var(--surface);overflow:auto;max-height:72vh}
 table.m{border-collapse:separate;border-spacing:0;width:100%;min-width:900px;font-variant-numeric:tabular-nums}
 table.m th,table.m td{padding:7px 8px;text-align:center;border-bottom:1px solid var(--line);white-space:nowrap}
@@ -79,12 +88,15 @@ table.m td.na{color:var(--muted)}
 table.m tr.sel th,table.m tr.sel td:not(.min){background:var(--gold-soft)}
 .mnote{color:var(--muted);font-size:.85rem;margin:8px 2px 0}
 .mctl{display:flex;flex-wrap:wrap;gap:8px 12px;align-items:center;margin-top:16px}
+.mctl .seg{display:inline-flex}
 .mctl select{width:auto}
+/* summary */
 .summary{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px;margin-top:18px}
 .stat{padding:12px 14px;border-radius:12px;background:var(--accent-soft)}
 .stat.gold{background:var(--gold-soft)}
 .stat b{display:block;font-family:var(--font-display);font-size:1.35rem}
 .stat small{color:var(--muted)}
+/* list */
 .listhead,.row>summary{display:grid;grid-template-columns:2.2rem minmax(150px,1.6fr) repeat(4,minmax(90px,1fr)) 1.4rem;gap:10px;align-items:center}
 .listhead{margin-top:22px;padding:0 14px 8px;font-size:.82rem;color:var(--muted);font-weight:600;border-bottom:1px solid var(--line)}
 .rows{display:flex;flex-direction:column}
@@ -102,6 +114,7 @@ table.m tr.sel th,table.m tr.sel td:not(.min){background:var(--gold-soft)}
 .tag.best{background:var(--accent-soft);color:var(--accent)}
 .price{font-variant-numeric:tabular-nums}
 .price .lbl{display:none;font-size:.78rem;color:var(--muted)}
+.price s{color:var(--muted)}
 .disc{color:var(--gold);font-weight:700}
 .nodisc{color:var(--muted);font-size:.9rem}
 .chev{color:var(--muted);transition:transform .2s}
@@ -193,7 +206,7 @@ footer a{color:var(--accent)}
 
   </div>
   <footer>
-    <div><b>מקור המחירים והלוגואים:</b> <a href="https://life.cma.gov.il/" target="_blank" rel="noopener">מחשבון ביטוח חיים של רשות שוק ההון</a>, נשלף ב-__DATE__. פרמיה משתנה כל שנה (המחירון מכסה 20 שנה, ואפשר לצפות ב-10 או ב-20). אלה המחירים המרביים שהחברות דיווחו, לפני הנחות ולפני חיתום רפואי. המחירים מעוגלים לשקל, ולכן הסכום ל-20 שנה יכול להיות שונה בכמה עשרות שקלים מהמחשבון. המחשבון מחזיר מחיר עבור מיליון ₪, וסכומים אחרים מחושבים באופן יחסי.</div>
+    <div><b>מקור המחירים והלוגואים:</b> <a href="https://life.cma.gov.il/" target="_blank" rel="noopener">מחשבון ביטוח חיים של רשות שוק ההון</a>, נשלף ב-__DATE__. פרמיה משתנה כל שנה (המחירון מכסה 20 שנה, ואפשר לצפות ב-10 או ב-20). אלה המחירים המרביים שהחברות דיווחו, לפני הנחות ולפני חיתום רפואי. המחירים מעוגלים לשקל, ולכן הסכום ל-20 שנה יכול להיות שונה בכמה עשרות שקלים מהמחשבון. המחשבון מחזיר מחיר עבור מיליון ₪, וסכומים אחרים מחושבים באופן יחסי (בבדיקה בין 500 אלף ל-2 מיליון המחיר היה יחסי בדיוק).</div>
     <div><b>מקור ההנחות:</b> <a href="https://www.poenta.co.il/article/regulations-discounts-life-insurance/" target="_blank" rel="noopener">פואנטה, 25.10.2026</a>. ההנחות פורסמו למסלולים מסוימים (למשל "ריסק אקטיב" במגדל, "דרור GO 1" באיילון), שאינם בהכרח המוצר שבמחשבון, ולכן המחיר אחרי הנחה הוא הערכה בלבד. לחברות האחרות לא מצאתי אחוזי הנחה שפורסמו.</div>
     <div>המידע אינו ייעוץ ביטוחי. המחיר הסופי נקבע בהצעה מחברת הביטוח או מסוכן מורשה.</div>
   </footer>
