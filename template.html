@@ -1,57 +1,39 @@
-<!--HEAD title="מחירון ביטוח ריסק – השוואת מחירי ביטוח חיים בכל החברות" desc="השוואת פרמיות ביטוח חיים (ריסק) של 11 חברות ביטוח, לכל גיל מ-18 עד 69, עם אחוזי הנחה לכל חברה וטופס הקמת פוליסה לסוכנים." path=""-->
-<div id="intro" class="intro" aria-hidden="true">
-  <div class="intro-stage">
-    <div class="cube"><i class="f1"></i><i class="f2"></i><i class="f3"></i><i class="f4"></i><i class="f5"></i><i class="f6"></i></div>
-    <div class="intro-title"><span>מחירון</span> <span>ביטוח</span> <span>ריסק</span></div>
-    <div class="intro-bar"><i></i></div>
-  </div>
-  <button type="button" class="intro-skip" id="intro-skip" tabindex="-1">דלג</button>
-</div>
-<canvas id="bg3d" class="bg3d" aria-hidden="true"></canvas>
+<!--HEAD title="מחירון ביטוח ריסק – השוואת מחירי ביטוח חיים בכל החברות" desc="כמה עולה ביטוח חיים (ריסק) היום? מחיר חודשי בכל 11 חברות הביטוח לכל גיל מ-18 עד 69, ושיחה עם סוכן מורשה בלחיצה." path=""-->
 <!--SITEHEADER-->
 <main id="main" class="wrap" tabindex="-1">
   <p class="lede hide" id="lede">השוואת הפרמיה החודשית בביטוח חיים (ריסק) בכל חברות הביטוח, לכל גיל מ-18 עד 69, לפי מין ועישון, כולל ההנחות שבחרת. המחירים לקוחים מהמחשבון הרשמי של רשות שוק ההון.</p>
 
   <section id="home">
-    <div class="hero">
-      <div class="reveal">
+    <div class="hero2">
+      <div class="h-txt">
         <span class="kicker">עודכן ב-<b id="f-date">__DATE__</b> · מקור: רשות שוק ההון</span>
-        <h2>כמה באמת עולה ביטוח חיים, ואיך המחיר משתנה משנה לשנה?</h2>
-        <p class="sub">כל חברות הביטוח במקום אחד, לכל גיל מ-18 עד 69. רואים מי הזולה היום, מגדירים אחוזי הנחה לכל חברה, ומקימים פוליסה ללקוח בכמה צעדים.</p>
-        <ul class="facts"><li><b class="count" data-to="11">11</b><small>חברות ביטוח</small></li><li><b class="count" data-to="52">52</b><small>גילאים</small></li><li><b class="count" data-to="20">20</b><small>שנות מחירים קדימה</small></li></ul>
-        <div class="hero-ctas"><button type="button" class="cta" data-go="m">לטבלת המחירים</button><button type="button" class="cta ghost" data-open-policy>הקמת פוליסה</button></div>
+        <h2>כמה עולה ביטוח חיים <em>היום</em>?</h2>
+        <p class="sub">המחיר החודשי בכל 11 חברות הביטוח, אחת ליד השנייה. בוחרים חברה ומשאירים פרטים, וסוכן מורשה חוזר אליך עם ההצעה.</p>
       </div>
-      <div class="quick reveal tilt" aria-label="בדיקה מהירה">
-        <h3>בדיקה מהירה</h3>
+      <div class="qbar" role="group" aria-label="פרטי המבוטח">
         <label class="field" for="l-age"><span>גיל</span><select id="l-age"></select></label>
         <div class="field"><span id="lg-l">מין</span><div class="seg" id="l-g" role="group" aria-labelledby="lg-l"><button type="button" data-v="m" aria-pressed="true">גבר</button><button type="button" data-v="f" aria-pressed="false">אישה</button></div></div>
         <div class="field"><span id="ls-l">עישון</span><div class="seg" id="l-s" role="group" aria-labelledby="ls-l"><button type="button" data-v="0" aria-pressed="true">לא מעשן</button><button type="button" data-v="1" aria-pressed="false">מעשן</button></div></div>
-        <div id="l-res" aria-live="polite"></div>
-        <button type="button" class="cta" id="l-go">לטבלה המלאה</button>
+        <label class="field" for="l-sum"><span>סכום ביטוח</span><select id="l-sum"><option value="500000">500 אלף ₪</option><option value="1000000">מיליון ₪</option><option value="1500000">1.5 מיליון ₪</option><option value="2000000">2 מיליון ₪</option><option value="3000000">3 מיליון ₪</option></select></label>
       </div>
     </div>
-
-    <section class="carousel-wrap reveal" aria-roledescription="קרוסלה" aria-label="חברות הביטוח">
-      <h2 class="sec-h">כל חברות הביטוח שבהשוואה</h2>
-      <div class="carousel" id="carousel"><div class="ring" id="ring"></div></div>
-      <div class="car-info" id="car-info" aria-live="polite"></div>
-      <div class="car-ctl"><button type="button" class="btn2" id="car-prev" aria-label="החברה הקודמת">→</button><button type="button" class="btn2" id="car-pause" aria-label="עצור סיבוב">❚❚</button><button type="button" class="btn2" id="car-next" aria-label="החברה הבאה">←</button></div>
-    </section>
+    <div class="cogrid" id="cogrid" aria-live="polite"></div>
+    <p class="gnote"><span class="mut" id="g-cap"></span> <button type="button" class="linkb" data-go="c">להשוואה המפורטת ←</button></p>
 
     <div class="tiles">
-      <button type="button" class="tile reveal tilt" data-go="m"><b>טבלה לפי גיל</b><span>כל הגילאים מול כל החברות, הזולה בכל גיל מסומנת.</span></button>
-      <button type="button" class="tile reveal tilt" data-go="t"><b>מגמת מחירים שנה אחרי שנה</b><span>10 או 20 שנה קדימה, עם אחוזי עלייה וירידה בכל שנה.</span></button>
-      <button type="button" class="tile reveal tilt" data-go="c"><b>השוואה מפורטת</b><span>גרף לכל חברה, טבלה שנתית ומחיר אחרי הנחה.</span></button>
-      <button type="button" class="tile reveal tilt" data-go="d"><b>אחוזי הנחה</b><span>קובעים אחוז הנחה לכל חברה, והמחירים מתעדכנים בכל האתר.</span></button>
+      <button type="button" class="tile tilt" data-go="m"><b>טבלה לפי גיל</b><span>כל הגילאים מול כל החברות, הזולה בכל גיל מסומנת.</span></button>
+      <button type="button" class="tile tilt" data-go="t"><b>איך המחיר ישתנה</b><span>המחיר בכל שנה קדימה, עם אחוזי עלייה וירידה.</span></button>
+      <button type="button" class="tile tilt" data-go="c"><b>השוואה מפורטת</b><span>גרף לכל חברה, טבלה שנתית ומחיר אחרי הנחה.</span></button>
+      <button type="button" class="tile tilt" data-go="d"><b>אחוזי הנחה</b><span>קובעים אחוז הנחה לכל חברה, והמחירים מתעדכנים בכל האתר.</span></button>
     </div>
 
-    <section class="features reveal" aria-labelledby="ft-h">
-      <h2 class="sec-h" id="ft-h">למה להשתמש במחירון</h2>
+    <section class="features" aria-labelledby="ft-h">
+      <h2 class="sec-h" id="ft-h">איך זה עובד</h2>
       <ul>
-        <li><b>נתונים רשמיים</b><span>המחירים נשלפים מהמחשבון של רשות שוק ההון ולא מפרסומות.</span></li>
-        <li><b>פרטיות מלאה</b><span>אין שרת, אין עוגיות מעקב. פרטי לקוח בטופס לא נשמרים ולא נשלחים לשום מקום בלי לחיצה שלך.</span></li>
-        <li><b>לסוכני ביטוח</b><span>טופס הקמת פוליסה מוכן לשליחה בוואטסאפ, במייל או כ-PDF.</span></li>
-        <li><b>נגיש</b><span>תפריט נגישות, ניווט במקלדת, ניגודיות גבוהה ועצירת הנפשות.</span></li>
+        <li><b>1. משווים</b><span>מחירי מחירון רשמיים מהמחשבון של רשות שוק ההון, לא מפרסומות.</span></li>
+        <li><b>2. בוחרים</b><span>לוחצים "לשיחה עם סוכן" על החברה שמתאימה לך.</span></li>
+        <li><b>3. סוכן חוזר אליך</b><span>הבקשה עוברת לסוכן ביטוח מורשה אחד בלבד, שרואה את הביטוח שבחרת.</span></li>
+        <li><b>נגיש</b><span>תפריט נגישות, ניווט במקלדת וניגודיות גבוהה.</span></li>
       </ul>
     </section>
   </section>
@@ -59,7 +41,30 @@
 <!--INCLUDE src/app-section.html-->
 </main>
 
-<button type="button" class="policy-tab" id="policy-tab" data-open-policy aria-controls="policy" aria-expanded="false"><span>הקמת פוליסה</span></button>
+<aside class="drawer" id="lead" aria-labelledby="l-h" role="dialog" aria-modal="true" hidden>
+  <div class="drawer-in">
+    <div class="dr-top"><h2 id="l-h">שיחה עם סוכן ביטוח</h2><button type="button" class="x" id="lead-close" aria-label="סגירה">✕</button></div>
+    <form id="lform" novalidate>
+      <div id="lead-body">
+        <p class="mut m0">סוכן ביטוח מורשה יחזור אליך עם הצעה לביטוח שבחרת. בלי התחייבות.</p>
+        <div class="lq" id="lq"></div>
+        <label class="field"><span>חברת הביטוח</span><select id="lf-co"></select></label>
+        <label class="field"><span>שם מלא *</span><input id="lf-name" maxlength="80" autocomplete="name" required></label>
+        <label class="field"><span>טלפון נייד *</span><input id="lf-phone" type="tel" inputmode="tel" maxlength="14" autocomplete="tel" required></label>
+        <label class="field"><span>אימייל (לא חובה)</span><input id="lf-mail" type="email" maxlength="100" autocomplete="email"></label>
+        <label class="field"><span>מתי נוח לדבר?</span><select id="lf-time"><option value="">בכל שעה</option><option>בבוקר</option><option>בצהריים</option><option>בערב</option></select></label>
+        <label class="field"><span>הערות (לא חובה)</span><textarea id="lf-notes" maxlength="400" rows="2"></textarea></label>
+        <label class="hp" aria-hidden="true">אתר<input id="lf-web" tabindex="-1" autocomplete="off"></label>
+        <label class="chk"><input type="checkbox" id="lf-consent" required> אני מסכים/ה שהפרטים יועברו לסוכן ביטוח מורשה כדי שיחזור אליי עם הצעה. <a href="privacy.html" target="_blank">מדיניות פרטיות</a></label>
+        <p class="perr" id="lf-err" role="alert"></p>
+        <button type="submit" class="cta wide" id="lf-send">שליחת בקשה לשיחה</button>
+      </div>
+      <div id="lead-done" class="ldone" hidden tabindex="-1"></div>
+    </form>
+  </div>
+</aside>
+
+<button type="button" class="policy-tab hide" id="policy-tab" data-open-policy aria-controls="policy" aria-expanded="false"><span>הקמת פוליסה</span></button>
 <aside class="drawer" id="policy" aria-labelledby="p-h" role="dialog" aria-modal="true" hidden>
   <div class="drawer-in">
     <div class="dr-top"><h2 id="p-h">הקמת פוליסת ריסק</h2><button type="button" class="x" id="p-close" aria-label="סגירה">✕</button></div>
@@ -70,7 +75,6 @@
         <div class="field"><span>מין</span><div class="seg" id="p-g" role="group" aria-label="מין"><button type="button" data-v="m">גבר</button><button type="button" data-v="f">אישה</button></div></div>
         <div class="field"><span>עישון</span><div class="seg" id="p-s" role="group" aria-label="עישון"><button type="button" data-v="0">לא מעשן</button><button type="button" data-v="1">מעשן</button></div></div>
         <label class="field"><span>סכום ביטוח (₪)</span><input id="p-sum" type="number" min="100000" max="5000000" step="50000" inputmode="numeric" required></label>
-        <div class="field"><span>תקופה</span><div class="seg" id="p-h2" role="group" aria-label="תקופה"><button type="button" data-v="10">10 שנים</button><button type="button" data-v="20">20 שנה</button></div></div>
       </fieldset>
       <fieldset class="pstep" data-step="1" hidden><legend>בחירת חברת ביטוח</legend><div class="pco" id="p-co" role="radiogroup" aria-label="חברת ביטוח"></div></fieldset>
       <fieldset class="pstep" data-step="2" hidden><legend>פרטי הלקוח והסוכן</legend>
@@ -84,14 +88,14 @@
         <label class="field"><span>שם הסוכן</span><input id="a-name" maxlength="60"></label>
         <label class="field"><span>מספר רישיון סוכן</span><input id="a-lic" maxlength="12" inputmode="numeric"></label>
         <label class="field"><span>וואטסאפ / טלפון לשליחה (של הסוכן או המשרד)</span><input id="a-phone" type="tel" maxlength="13" inputmode="tel"></label>
-        <label class="field"><span>מייל לשליחה</span><input id="a-mail" type="email" maxlength="80"></label>
+        <label class="field"><span>מייל לשליחה (למשל המפיק בחברה)</span><input id="a-mail" type="email" maxlength="80"></label>
         <label class="chk"><input type="checkbox" id="a-remember"> לזכור את פרטי הסוכן במכשיר הזה (פרטי הלקוח אף פעם לא נשמרים)</label>
         <label class="chk"><input type="checkbox" id="c-consent" required> הלקוח הסכים שפרטיו יועברו לסוכן לצורך הצעת ביטוח *</label>
       </fieldset>
       <fieldset class="pstep" data-step="3" hidden><legend>סיכום ושליחה</legend>
         <pre class="psum" id="p-sum-out" tabindex="0"></pre>
         <div class="pact"><button type="button" class="cta" id="p-wa">שליחה בוואטסאפ</button><button type="button" class="btn2" id="p-mail">שליחה במייל</button><button type="button" class="btn2" id="p-copy">העתקה</button><button type="button" class="btn2" id="p-print">הדפסה / PDF</button></div>
-        <p class="mnote">השליחה נפתחת באפליקציה שלך (וואטסאפ או מייל). האתר לא שולח ולא שומר את פרטי הלקוח. זו בקשה להצעה בלבד, והפוליסה נקבעת רק אחרי חיתום של חברת הביטוח.</p>
+        <p class="mnote">השליחה נפתחת באפליקציה שלך (וואטסאפ או מייל). זו בקשה להצעה בלבד, והפוליסה נקבעת רק אחרי חיתום של חברת הביטוח.</p>
         <button type="button" class="btn2" id="p-clear">ניקוי פרטי לקוח</button>
       </fieldset>
       <p class="perr" id="p-err" role="alert"></p>
@@ -102,6 +106,7 @@
 <div class="scrim" id="scrim" hidden></div>
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
 <!--SITEFOOTER-->
+<script src="config.js?v=__VER__"></script>
 <script src="data.js?v=__VER__"></script>
 <script src="app.js?v=__VER__"></script>
 <!--/HEAD-->

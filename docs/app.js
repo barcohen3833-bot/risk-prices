@@ -16,7 +16,9 @@ function pct(x){ if(x==null||!isFinite(x)) return `<span class="pc fl">—</span
 const ages=[...new Set(Object.keys(DATA).map(k=>+k.split("|")[0]))].sort((a,b)=>a-b);
 state.age=ages.includes(35)?35:ages[0];
 try{const s=JSON.parse(localStorage.getItem("risk-prefs")||"null"); if(s&&ages.includes(s.age)) Object.assign(state,s);}catch(e){}
-state.screen="home"; if(![10,20].includes(state.horizon)) state.horizon=20;
+state.screen="home"; state.horizon=20; if(state.sum<100000||state.sum>5000000) state.sum=1000000;
+const SB=window.RISK_SB&&/^https:\/\/[a-z0-9-]+\.supabase\.co$/.test(window.RISK_SB.url)?window.RISK_SB:null;
+const isAgent=()=>{try{return !!JSON.parse(localStorage.getItem("risk-sb")||"null")?.access_token;}catch(e){return false;}};
 
 function logo(name){const src=LOGOS[name]; return src?`<span class="logo"><img src="${src}" alt="" loading="lazy"></span>`:`<span class="logo txt">${initials(name)}</span>`;}
 function initials(name){const w=name.replace(/ביטוח|חברה ל|חברה/g,"").trim().split(/\s+/); return w[0]==="AIG"?"AIG":(w[0]||name).slice(0,2);}
@@ -69,8 +71,16 @@ function renderHome(){
   document.getElementById("l-age").value=state.age;
   document.querySelectorAll("#l-g button").forEach(b=>b.setAttribute("aria-pressed",b.dataset.v===state.g));
   document.querySelectorAll("#l-s button").forEach(b=>b.setAttribute("aria-pressed",b.dataset.v===state.s));
-  const list=compute().sort((a,b)=>a.total-b.total).slice(0,3);
-  document.getElementById("l-res").innerHTML=list.length?`<small class="mut">שלוש החברות הזולות ל-${yw(state.horizon)} (מחירון, ${fmt(state.sum)} ₪ ביטוח)</small>`+list.map((r,i)=>`<div class="qrow"><span class="rank">${i+1}</span>${logo(r.name)}<span class="name">${r.name}</span><span class="num"><b>${fmt(r.first)} ₪</b> <small class="mut">לחודש</small></span></div>`).join(""):`<small class="mut">אין נתונים לגיל הזה.</small>`;
+  document.getElementById("l-sum").value=String(state.sum);
+  if(document.getElementById("l-sum").value!==String(state.sum)){const o=document.createElement("option"); o.value=state.sum; o.textContent=fmt(state.sum)+" ₪"; document.getElementById("l-sum").appendChild(o); document.getElementById("l-sum").value=String(state.sum);}
+  const list=compute().sort((a,b)=>(a.dfirst??a.first)-(b.dfirst??b.first)); const have=new Set(list.map(r=>r.name));
+  const cards=list.map((r,i)=>{const d=r.dfirst!=null&&r.dfirst<r.first-.5;
+    return `<div class="cocard${i===0?" best":""}"><span class="rk">${i===0?"הכי זול":i+1}</span>${logo(r.name)}<span class="cn">${r.name}</span>
+      <span class="cp">${d?`<s>${fmt(r.first)}</s>`:""}<b class="num">${fmt(d?r.dfirst:r.first)} ₪</b><small>לחודש${d?" אחרי הנחה":""}</small></span>
+      <button type="button" class="cbtn" data-lead-co="${r.ci}">לשיחה עם סוכן</button></div>`;});
+  COMPANIES.forEach(n=>{if(!have.has(n)) cards.push(`<div class="cocard na">${logo(n)}<span class="cn">${n}</span><span class="cp"><small>אין הצעה לגיל ${state.age}</small></span></div>`);});
+  document.getElementById("cogrid").innerHTML=cards.join("");
+  document.getElementById("g-cap").textContent=`גיל ${state.age}, ${state.g==="m"?"גבר":"אישה"}, ${state.s==="1"?"מעשן":"לא מעשן"}, ${fmt(state.sum)} ₪. מחיר חודשי בשנה הראשונה לפני חיתום.`;
 }
 function render(){
   const home=state.screen==="home";
@@ -78,8 +88,7 @@ function render(){
   document.getElementById("app").classList.toggle("hide",home);
   document.getElementById("back").classList.toggle("hide",home);
   document.getElementById("lede").classList.toggle("hide",home);
-  if(home){renderHome(); window.__placeCarousel?.(); return;}
-  document.querySelectorAll("#horizon button").forEach(b=>b.setAttribute("aria-pressed",+b.dataset.v===state.horizon));
+  if(home){renderHome(); try{localStorage.setItem("risk-prefs",JSON.stringify({...state,screen:"home"}));}catch(e){} return;}
   document.querySelectorAll("#unit button").forEach(b=>b.setAttribute("aria-pressed",b.dataset.v===state.unit));
   document.getElementById("lh-avg").textContent="ממוצע "+(state.unit==="y"?"שנתי":"חודשי");
   document.getElementById("lh-total").textContent="סה״כ ל-"+yw(state.horizon);
@@ -119,7 +128,7 @@ function render(){
     } else if(r.dc) det+=`<p><b>הנחה שהגדרת:</b> ${r.dc.label}.</p>`;
     else det+=`<p>לא הוגדרה הנחה לחברה הזו. אפשר לקבוע אחוז הנחה בלשונית "הנחות".</p>`;
     if(r.dtotal!=null) det+=`<p>עלות משוערת ל-${yw(state.horizon)} אחרי הנחה: <b class="num">${fmt(r.dtotal)} ₪</b> (חיסכון של כ-${fmt(r.total-r.dtotal)} ₪).</p>`;
-    det+=`<div class="rowact"><button type="button" class="cta" data-policy-co="${r.ci}">הקמת פוליסה ב${r.name}</button> <button type="button" class="btn2" data-go-disc>עריכת הנחה</button></div>`;
+    det+=`<div class="rowact"><button type="button" class="cta" data-lead-co="${r.ci}">לשיחה עם סוכן על ${r.name}</button>${isAgent()?` <button type="button" class="btn2" data-policy-co="${r.ci}">הקמת פוליסה</button>`:""} <button type="button" class="btn2" data-go-disc>עריכת הנחה</button></div>`;
     return `<details class="row"><summary>
       <span class="rank">${i+1}</span>
       <span class="co">${logo(r.name)}<span class="name">${r.name}${best}</span></span>
@@ -137,11 +146,10 @@ ageEl.addEventListener("change",()=>{state.age=+ageEl.value; render();});
 document.getElementById("tab-m").addEventListener("click",()=>{state.view="m"; render();});
 document.getElementById("tab-c").addEventListener("click",()=>{state.view="c"; render();});
 document.getElementById("tab-t").addEventListener("click",()=>{state.view="t"; render();});
-document.getElementById("horizon").addEventListener("click",e=>{const b=e.target.closest("button"); if(b){state.horizon=+b.dataset.v; render();}});
 document.getElementById("unit").addEventListener("click",e=>{const b=e.target.closest("button"); if(b){state.unit=b.dataset.v; render();}});
 function go(v){state.screen="app"; state.view=v; render(); window.scrollTo({top:0});}
 document.querySelectorAll("[data-go]").forEach(b=>b.addEventListener("click",()=>go(b.dataset.go)));
-document.getElementById("l-go").addEventListener("click",()=>go("m"));
+document.getElementById("l-sum").addEventListener("change",e=>{state.sum=+e.target.value; document.getElementById("sum").value=state.sum; render();});
 document.getElementById("back").addEventListener("click",()=>{state.screen="home"; render(); window.scrollTo({top:0});});
 const lAge=document.getElementById("l-age"); lAge.innerHTML=ages.map(a=>`<option value="${a}">${a}</option>`).join("");
 lAge.addEventListener("change",()=>{state.age=+lAge.value; render();});
@@ -210,30 +218,10 @@ document.addEventListener("click",e=>{
   if(e.target.closest("[data-go-disc]")){state.screen="app"; state.view="d"; render(); window.scrollTo({top:0});}
   const pc=e.target.closest("[data-policy-co]"); if(pc) openPolicy(+pc.dataset.policyCo);
   if(e.target.closest("[data-open-policy]")) openPolicy();
+  const lc=e.target.closest("[data-lead-co]"); if(lc) openLead(+lc.dataset.leadCo);
+  if(e.target.closest("[data-lead]")) openLead();
 });
 document.getElementById("home-link")?.addEventListener("click",e=>{e.preventDefault(); state.screen="home"; render(); window.scrollTo({top:0});});
-
-// ===== 3D carousel of company logos =====
-(function carousel(){
-  const ring=document.getElementById("ring"), info=document.getElementById("car-info"); if(!ring) return;
-  const N=COMPANIES.length, step=360/N; let idx=0, timer=null, paused=false;
-  const cards=COMPANIES.map((n,i)=>{const c=document.createElement("div"); c.className="card3d"; c.setAttribute("role","button"); c.tabIndex=-1; c.setAttribute("aria-label",n);
-    if(LOGOS[n]){const im=document.createElement("img"); im.src=LOGOS[n]; im.alt=""; c.appendChild(im);} else {const s=document.createElement("span"); s.className="txt"; s.textContent=n; c.appendChild(s);}
-    c.addEventListener("click",()=>{ if(i===idx){state.screen="app"; state.view="c"; render(); window.scrollTo({top:0});} else go2(i);}); ring.appendChild(c); return c;});
-  function layout(){const w=ring.offsetWidth||170, r=Math.round((w/2+18)/Math.tan(Math.PI/N)); cards.forEach((c,i)=>c.style.transform=`rotateY(${i*step}deg) translateZ(${r}px)`); ring.dataset.r=r; place();}
-  function place(){ring.style.transform=`translateZ(${-ring.dataset.r}px) rotateY(${-idx*step}deg)`; const i=((idx%N)+N)%N; cards.forEach((c,j)=>c.classList.toggle("on",j===i));
-    const n=COMPANIES[i], list=compute().sort((a,b)=>a.first-b.first), pos=list.findIndex(r=>r.name===n), r=list[pos];
-    info.innerHTML=`<b>${n}</b>${r?`<span class="mut">גיל ${state.age}, ${state.g==="m"?"גבר":"אישה"}: <b class="num">${fmt(r.first)} ₪</b> לחודש בשנה הראשונה · מקום ${pos+1} מתוך ${list.length}</span>`:`<span class="mut">אין הצעה לגיל ${state.age}</span>`}`;}
-  function go2(i){const cur=((idx%N)+N)%N; let d=i-cur; if(d>N/2) d-=N; if(d<-N/2) d+=N; idx+=d; place();}
-  const still=()=>paused||document.hidden||motionOff();
-  function start(){clearInterval(timer); timer=setInterval(()=>{if(!still()){idx++; place();}},2600);}
-  document.getElementById("car-next").addEventListener("click",()=>{idx++; place();});
-  document.getElementById("car-prev").addEventListener("click",()=>{idx--; place();});
-  const pb=document.getElementById("car-pause"); pb.addEventListener("click",()=>{paused=!paused; pb.textContent=paused?"▶":"❚❚"; pb.setAttribute("aria-label",paused?"הפעל סיבוב":"עצור סיבוב");});
-  const car=document.getElementById("carousel"); let hover=false;
-  car.addEventListener("mouseenter",()=>{hover=paused; paused=true;}); car.addEventListener("mouseleave",()=>{paused=hover||pb.textContent==="▶";});
-  window.addEventListener("resize",layout); layout(); start(); window.__placeCarousel=place;
-})();
 
 // ===== policy setup drawer (for insurance agents) =====
 const P={step:0,co:null,age:state.age,g:state.g,s:state.s,sum:state.sum,h:state.horizon};
@@ -250,7 +238,7 @@ function segSet(id,v){document.querySelectorAll(`#${id} button`).forEach(b=>b.se
 function pRender(){
   document.querySelectorAll(".pstep").forEach(f=>f.hidden=+f.dataset.step!==P.step);
   document.querySelectorAll("#p-steps li").forEach((l,i)=>{l.classList.toggle("on",i<=P.step); l.toggleAttribute("aria-current",i===P.step);});
-  pAge.value=P.age; segSet("p-g",P.g); segSet("p-s",P.s); segSet("p-h2",P.h); $("p-sum").value=P.sum;
+  pAge.value=P.age; segSet("p-g",P.g); segSet("p-s",P.s); $("p-sum").value=P.sum;
   $("p-back").style.visibility=P.step?"visible":"hidden"; $("p-next").hidden=P.step===3;
   if(P.step===1){const q=pQuotes(); if(P.co!=null&&!q.some(r=>r.ci===P.co)) P.co=null;
     $("p-co").innerHTML=q.length?q.map((r,i)=>`<label><input type="radio" name="pco" value="${r.ci}"${P.co===r.ci?" checked":""}>${logo(r.n)}<span class="name">${r.n}${i===0?' <span class="tag best">הכי זול</span>':""}</span><span class="pr">${r.label?`<s>${fmt(r.first)} ₪</s>`:""}<b>${fmt(r.dfirst)} ₪</b> לחודש</span></label>`).join(""):`<p class="empty">אין הצעות לגיל ${P.age} ל-${yw(P.h)}.</p>`;}
@@ -274,7 +262,7 @@ function validate(){
 function summary(){
   const q=pQuotes().find(r=>r.ci===P.co)||{}; const L=[];
   L.push("בקשה להקמת פוליסת ביטוח חיים (ריסק)","");
-  L.push(`חברה: ${q.n||""}`,`סכום ביטוח: ${fmt(P.sum)} ₪ · תקופה: ${yw(P.h)}`,`מבוטח: גיל ${P.age}, ${P.g==="m"?"גבר":"אישה"}, ${P.s==="1"?"מעשן":"לא מעשן"}`);
+  L.push(`חברה: ${q.n||""}`,`סכום ביטוח: ${fmt(P.sum)} ₪`,`מבוטח: גיל ${P.age}, ${P.g==="m"?"גבר":"אישה"}, ${P.s==="1"?"מעשן":"לא מעשן"}`);
   L.push(`פרמיה חודשית בשנה הראשונה: ${fmt(q.first||0)} ₪ (מחירון)`); if(q.label) L.push(`אחרי הנחה (${q.label}): ${fmt(q.dfirst)} ₪ · סה״כ משוער ל-${yw(P.h)}: ${fmt(q.total)} ₪`);
   L.push("","פרטי הלקוח:",`שם: ${txt("c-name")}`,`ת״ז: ${$("c-id").value.trim()}`,`טלפון: ${phoneNorm($("c-phone").value)}`);
   if(txt("c-mail")) L.push(`מייל: ${txt("c-mail")}`); if($("c-dob").value) L.push(`תאריך לידה: ${$("c-dob").value.split("-").reverse().join("/")}`); if(txt("c-notes")) L.push(`הערות: ${txt("c-notes")}`);
@@ -292,11 +280,11 @@ function openPolicy(co){
 }
 function closePolicy(){drawer.classList.remove("open"); scrim.hidden=true; $("policy-tab").setAttribute("aria-expanded","false"); document.body.style.overflow="";
   setTimeout(()=>{drawer.hidden=true;},motionOff()?0:350); lastFocus?.focus?.();}
-$("p-close").addEventListener("click",closePolicy); scrim.addEventListener("click",closePolicy);
+$("p-close").addEventListener("click",closePolicy); scrim.addEventListener("click",()=>{ if(!lead.hidden) closeLead(); else closePolicy(); });
 drawer.addEventListener("keydown",e=>{ if(e.key==="Escape") closePolicy();
   if(e.key==="Tab"){const f=[...drawer.querySelectorAll("button,input,select,textarea,[tabindex='0']")].filter(x=>!x.closest("[hidden]")&&x.offsetParent!==null); const a=f[0],z=f[f.length-1];
     if(e.shiftKey&&document.activeElement===a){e.preventDefault(); z.focus();} else if(!e.shiftKey&&document.activeElement===z){e.preventDefault(); a.focus();}}});
-for(const [id,key,num] of [["p-g","g"],["p-s","s"],["p-h2","h",1]]) $(id).addEventListener("click",e=>{const b=e.target.closest("button"); if(b){P[key]=num?+b.dataset.v:b.dataset.v; pRender();}});
+for(const [id,key,num] of [["p-g","g"],["p-s","s"]]) $(id).addEventListener("click",e=>{const b=e.target.closest("button"); if(b){P[key]=num?+b.dataset.v:b.dataset.v; pRender();}});
 pAge.addEventListener("change",()=>{P.age=+pAge.value;});
 $("p-co").addEventListener("change",e=>{if(e.target.name==="pco") P.co=+e.target.value;});
 $("p-next").addEventListener("click",()=>{ if(!validate()) return; if(P.step===2) saveAgent(); P.step++; pRender(); drawer.scrollTop=0; drawer.querySelector(`.pstep[data-step="${P.step}"] legend`)?.setAttribute("tabindex","-1"); drawer.querySelector(`.pstep[data-step="${P.step}"] legend`)?.focus();});
@@ -308,6 +296,55 @@ $("p-mail").addEventListener("click",()=>{const to=mailOk(txt("a-mail"))?txt("a-
 $("p-print").addEventListener("click",()=>window.print());
 $("p-clear").addEventListener("click",()=>{clearClient(); P.step=2; pRender(); toast("פרטי הלקוח נמחקו");});
 window.addEventListener("pagehide",clearClient);
+$("policy-tab").classList.toggle("hide",!isAgent());
+// ===== client request: talk to an agent (stored in Supabase, assigned round-robin to the next active agent) =====
+const lead=$("lead"), lfCo=$("lf-co"); let leadFocus=null;
+const leadQuotes=()=>compute().sort((a,b)=>(a.dfirst??a.first)-(b.dfirst??b.first));
+const lp=r=>r.dfirst!=null&&r.dfirst<r.first-.5?r.dfirst:r.first;
+function leadInfo(){const q=leadQuotes().find(r=>r.ci===+lfCo.value);
+  $("lq").innerHTML=`<div><small>המבוטח</small><b>גיל ${state.age}, ${state.g==="m"?"גבר":"אישה"}, ${state.s==="1"?"מעשן":"לא מעשן"}</b></div><div><small>סכום ביטוח</small><b>${fmt(state.sum)} ₪</b></div><div><small>מחיר חודשי משוער</small><b>${q?fmt(lp(q))+" ₪":"—"}</b></div>`;}
+function openLead(co){
+  leadFocus=document.activeElement; const q=leadQuotes();
+  lfCo.innerHTML=q.map(r=>`<option value="${r.ci}">${r.name} · ${fmt(lp(r))} ₪ לחודש</option>`).join("");
+  if(co!=null&&q.some(r=>r.ci===co)) lfCo.value=String(co);
+  leadInfo(); $("lead-body").hidden=false; $("lead-done").hidden=true; $("lf-err").textContent="";
+  lead.hidden=false; scrim.hidden=false; requestAnimationFrame(()=>lead.classList.add("open")); document.body.style.overflow="hidden";
+  setTimeout(()=>$("lf-name").focus(),60);
+}
+function closeLead(){lead.classList.remove("open"); scrim.hidden=true; document.body.style.overflow=""; setTimeout(()=>{lead.hidden=true;},motionOff()?0:350); leadFocus?.focus?.();}
+lfCo.addEventListener("change",leadInfo);
+$("lead-close").addEventListener("click",closeLead);
+lead.addEventListener("keydown",e=>{ if(e.key==="Escape") closeLead();
+  if(e.key==="Tab"){const f=[...lead.querySelectorAll("button,input:not(#lf-web),select,textarea,a,[tabindex='0']")].filter(x=>!x.closest("[hidden]")&&x.offsetParent!==null); const a=f[0],z=f[f.length-1];
+    if(e.shiftKey&&document.activeElement===a){e.preventDefault(); z.focus();} else if(!e.shiftKey&&document.activeElement===z){e.preventDefault(); a.focus();}}});
+$("lform").addEventListener("submit",async e=>{
+  e.preventDefault(); const err=$("lf-err"), btn=$("lf-send"); err.textContent="";
+  const name=$("lf-name").value.replace(/[<>]/g,"").trim(), ph=phoneNorm($("lf-phone").value), mail=$("lf-mail").value.trim(), notes=$("lf-notes").value.replace(/[<>]/g,"").trim();
+  const bad=[]; const mark=(id,ok,msg)=>{$(id).setAttribute("aria-invalid",!ok); if(!ok) bad.push([id,msg]);};
+  mark("lf-name",name.length>=2,"צריך שם מלא"); mark("lf-phone",phoneOk(ph),"מספר טלפון לא תקין"); mark("lf-mail",mailOk(mail),"כתובת מייל לא תקינה"); mark("lf-consent",$("lf-consent").checked,"צריך לאשר העברת פרטים לסוכן");
+  if(bad.length){err.textContent=bad[0][1]; $(bad[0][0]).focus(); return;}
+  if($("lf-web").value) return;
+  if(!SB){err.textContent="שליחת בקשות עוד לא הופעלה באתר. נסו שוב בקרוב."; return;}
+  const q=leadQuotes().find(r=>r.ci===+lfCo.value); if(!q){err.textContent="צריך לבחור חברת ביטוח"; return;}
+  const quote={age:state.age,g:state.g,s:state.s,sum:state.sum,co:q.name,first:Math.round(q.first),dfirst:q.dfirst!=null?Math.round(q.dfirst):null,disc:q.applies&&q.dc?String(q.dc.label||"").slice(0,80):null,time:$("lf-time").value,date:window.RISK.DATE,
+    others:leadQuotes().slice(0,3).map(r=>[r.name,Math.round(lp(r))])};
+  btn.disabled=true; btn.textContent="שולח…";
+  try{
+    const r=await fetch(SB.url+"/rest/v1/rpc/submit_lead",{method:"POST",headers:{apikey:SB.key,"Content-Type":"application/json"},body:JSON.stringify({p_name:name,p_phone:ph,p_email:mail||null,p_notes:notes||null,p_quote:quote})});
+    const j=await r.json().catch(()=>null); if(!r.ok) throw new Error((j&&(j.message||j.hint))||"http "+r.status);
+    const ag=j&&j.agent?clean(j.agent):"";
+    const done=$("lead-done"); done.innerHTML=`<div class="okmark" aria-hidden="true">✓</div><h3>הבקשה נשלחה</h3><p>${ag?`הסוכן/ת <b>${ag}</b> יחזור/תחזור אליך`:"סוכן ביטוח מורשה יחזור אליך"} בהקדם, למספר <bdi dir="ltr">${ph}</bdi>.</p><p class="mut">הביטוח שבחרת: ${q.name}, כ-${fmt(lp(q))} ₪ לחודש, סכום ביטוח ${fmt(state.sum)} ₪. המחיר הסופי נקבע אחרי חיתום.</p><button type="button" class="btn2" id="lead-ok">סגירה</button>`;
+    $("lead-body").hidden=true; done.hidden=false; done.focus(); $("lead-ok").addEventListener("click",closeLead);
+    ["lf-notes"].forEach(id=>$(id).value="");
+  }catch(x){const m=String(x.message);
+    err.textContent=/duplicate/.test(m)?"כבר קיבלנו ממך בקשה בדקות האחרונות. סוכן יחזור אליך.":/busy/.test(m)?"יש עומס כרגע, נסו שוב בעוד דקה.":/invalid/.test(m)?"חלק מהפרטים לא תקינים, בדקו ונסו שוב.":"השליחה נכשלה. בדקו את החיבור לאינטרנט ונסו שוב.";
+  }finally{btn.disabled=false; btn.textContent="שליחת בקשה לשיחה";}
+});
+// opened from the agent dashboard: prefill the policy builder with a client's request
+try{const o=JSON.parse(sessionStorage.getItem("risk-open-policy")||"null"); sessionStorage.removeItem("risk-open-policy");
+  if(o&&isAgent()&&ages.includes(+o.age)){Object.assign(state,{age:+o.age,g:o.g==="f"?"f":"m",s:o.s==="1"?"1":"0",sum:Math.min(5e6,Math.max(1e5,+o.sum||1e6))}); render();
+    const ci=COMPANIES.indexOf(clean(o.co)); openPolicy(ci>=0?ci:undefined); $("c-name").value=String(o.name||"").slice(0,60); $("c-phone").value=String(o.phone||"").slice(0,13); $("c-mail").value=String(o.mail||"").slice(0,80);}}catch(e){}
+
 
 // ===== count-up numbers =====
 document.querySelectorAll(".count").forEach(el=>{const to=+el.dataset.to; if(motionOff()) return; el.textContent="0";
@@ -339,12 +376,6 @@ function toast(msg){const t=document.getElementById("toast"); if(!t) return; t.t
   document.addEventListener("keydown",e=>{if(e.key==="Escape"&&!menu.hidden){menu.hidden=true; btn.setAttribute("aria-expanded","false"); btn.focus();}});
   apply();
 })();
-(function intro(){
-  const el=document.getElementById("intro"); if(!el) return; let seen=false; try{seen=!!sessionStorage.getItem("risk-intro");}catch(e){}
-  const end=()=>{el.classList.add("done"); setTimeout(()=>el.classList.add("gone"),600); try{sessionStorage.setItem("risk-intro","1");}catch(e){}};
-  if(seen||motionOff()){el.classList.add("done","gone"); return;}
-  const sk=document.getElementById("intro-skip"); sk.tabIndex=0; sk.addEventListener("click",end); setTimeout(end,2300);
-})();
 (function reveal(){
   const els=document.querySelectorAll(".reveal"); if(!("IntersectionObserver" in window)||motionOff()){els.forEach(e=>e.classList.add("in")); return;}
   const io=new IntersectionObserver(es=>es.forEach(x=>{if(x.isIntersecting){x.target.classList.add("in"); io.unobserve(x.target);}}),{threshold:.12}); els.forEach(e=>io.observe(e));
@@ -354,22 +385,5 @@ function toast(msg){const t=document.getElementById("toast"); if(!t) return; t.t
   document.querySelectorAll(".tilt").forEach(el=>{
     el.addEventListener("pointermove",e=>{if(motionOff()) return; const r=el.getBoundingClientRect(), x=(e.clientX-r.left)/r.width-.5, y=(e.clientY-r.top)/r.height-.5; el.style.transform=`perspective(800px) rotateX(${(-y*7).toFixed(2)}deg) rotateY(${(x*9).toFixed(2)}deg) translateZ(4px)`;});
     el.addEventListener("pointerleave",()=>{el.style.transform="";});});
-})();
-(function bg3d(){
-  const c=document.getElementById("bg3d"); if(!c||!c.getContext) return; const g=c.getContext("2d"); let W,H,dpr,raf=0,t=0;
-  const P=[]; const n=260; for(let i=0;i<n;i++){const y=1-2*(i+.5)/n, r=Math.sqrt(1-y*y), th=i*2.39996; P.push([Math.cos(th)*r,y,Math.sin(th)*r]);}
-  const size=()=>{dpr=Math.min(2,devicePixelRatio||1); W=c.width=innerWidth*dpr; H=c.height=innerHeight*dpr;};
-  function frame(){
-    g.clearRect(0,0,W,H); const col=getComputedStyle(root).getPropertyValue("--accent").trim()||"#0E7466";
-    const R=Math.min(W,H)*.42, cx=W*.18, cy=H*.32, a=t*.0016, b=.35+Math.sin(t*.0007)*.15, ca=Math.cos(a), sa=Math.sin(a), cb=Math.cos(b), sb=Math.sin(b);
-    g.fillStyle=col;
-    for(const [x,y,z] of P){const x1=x*ca+z*sa, z1=-x*sa+z*ca, y1=y*cb-z1*sb, z2=y*sb+z1*cb, s=1.6/(2.6-z2);
-      g.globalAlpha=Math.max(.05,(z2+1)/2*.5); g.beginPath(); g.arc(cx+x1*R*s,cy+y1*R*s,(1+z2)*1.5*dpr,0,6.283); g.fill();}
-    g.globalAlpha=1;
-  }
-  function loop(){t+=16; frame(); raf=requestAnimationFrame(loop);}
-  function sync(){cancelAnimationFrame(raf); if(document.hidden) return; if(motionOff()) frame(); else loop();}
-  size(); addEventListener("resize",()=>{size(); sync();}); document.addEventListener("visibilitychange",sync);
-  new MutationObserver(sync).observe(root,{attributes:true,attributeFilter:["class","data-theme"]}); sync();
 })();
 if(window.RISK) main();

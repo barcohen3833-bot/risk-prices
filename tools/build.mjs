@@ -22,17 +22,22 @@ const logos = {};
 for (const n of comp) { const s = data.logos?.[n]; if (typeof s === "string" && /^data:image\/png;base64,[A-Za-z0-9+/=]+$/.test(s)) logos[n] = s; }
 const date = new Date(data.fetchedAt).toLocaleDateString("he-IL", { timeZone: "Asia/Jerusalem" });
 const dataJs = "window.RISK=" + JSON.stringify({ DATA: D, COMPANIES: comp, LOGOS: logos, DATE: date }) + ";\n";
-const ver = createHash("sha256").update(dataJs + read("src/app.js") + read("src/app.css") + read("template.html")).digest("hex").slice(0, 10);
+// ---- Supabase config (public URL + publishable/anon key; security comes from RLS in supabase/setup.sql) ----
+let cfg = {}; try { cfg = JSON.parse(read("config.json")); } catch {}
+const sbUrl = /^https:\/\/[a-z0-9-]+\.supabase\.co$/.test(cfg.supabaseUrl || "") ? cfg.supabaseUrl : "";
+const sbKey = sbUrl && /^[A-Za-z0-9._-]{20,400}$/.test(cfg.supabaseKey || "") ? cfg.supabaseKey : "";
+const configJs = "window.RISK_SB=" + JSON.stringify(sbKey ? { url: sbUrl, key: sbKey } : null) + ";\n";
+const ver = createHash("sha256").update(dataJs + configJs + read("src/app.js") + read("src/agent.js") + read("src/app.css") + read("template.html")).digest("hex").slice(0, 10);
 
 // ---- security headers that a static host allows via <meta> (GitHub Pages can't set real headers) ----
 const CSP = ["default-src 'none'", "script-src 'self'", "style-src 'self' https://fonts.googleapis.com",
-  "font-src https://fonts.gstatic.com", "img-src 'self' data:", "manifest-src 'self'", "connect-src 'none'",
+  "font-src https://fonts.gstatic.com", "img-src 'self' data:", "manifest-src 'self'", (sbKey ? `connect-src ${sbUrl}` : "connect-src 'none'"),
   "base-uri 'none'", "form-action 'none'", "object-src 'none'", "upgrade-insecure-requests"].join("; ");
 
 const header = path => `<a class="skip" href="#main">דלג לתוכן</a>
 <header class="site-h"><div class="wrap top">
   <a class="brand" href="./${path ? "" : "#"}" id="home-link"><svg viewBox="0 0 32 32" aria-hidden="true"><path d="M16 2 4 7v8c0 7.5 5 13.2 12 15 7-1.8 12-7.5 12-15V7z" fill="var(--accent)"/><path d="m10.5 16 4 4 7-8" stroke="#fff" stroke-width="2.6" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg><span>מחירון ביטוח ריסק</span></a>
-  <div class="tbtns"><button type="button" class="theme hide" id="back">→ דף הבית</button><button type="button" class="theme" id="a11y-btn" aria-expanded="false" aria-controls="a11y">♿ נגישות</button><button type="button" class="theme" id="theme" aria-label="מצב תצוגה"></button></div>
+  <div class="tbtns"><button type="button" class="theme hide" id="back">→ דף הבית</button><a class="theme agent-link" href="agent.html"><span class="lg">כניסת </span>סוכנים</a><button type="button" class="theme" id="a11y-btn" aria-expanded="false" aria-controls="a11y">♿ נגישות</button><button type="button" class="theme" id="theme" aria-label="מצב תצוגה"></button></div>
 </div>
 <div class="a11y" id="a11y" hidden role="group" aria-label="תפריט נגישות">
   <button type="button" data-a="font+">הגדלת טקסט</button><button type="button" data-a="font-">הקטנת טקסט</button><button type="button" data-a="contrast">ניגודיות גבוהה</button><button type="button" data-a="links">הדגשת קישורים</button><button type="button" data-a="motion">עצירת הנפשות</button><button type="button" data-a="reset">איפוס</button><a href="accessibility.html">הצהרת נגישות</a>
@@ -58,7 +63,7 @@ function page(src, outName) {
 <html lang="he" dir="rtl"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta http-equiv="Content-Security-Policy" content="${CSP}">
-<meta name="referrer" content="strict-origin-when-cross-origin">
+${outName === "agent.html" ? '<meta name="robots" content="noindex">\n' : ""}<meta name="referrer" content="strict-origin-when-cross-origin">
 <title>${title}</title>
 <meta name="description" content="${desc}">
 <link rel="canonical" href="${url}">
@@ -79,10 +84,12 @@ ${t.split("__DATE__").join(date).split("__VER__").join(ver)}
 
 mkdirSync("docs/.well-known", { recursive: true });
 writeFileSync("docs/data.js", dataJs);
+writeFileSync("docs/config.js", configJs);
+copyFileSync("src/agent.js", "docs/agent.js");
 copyFileSync("src/app.js", "docs/app.js");
 copyFileSync("src/app.css", "docs/app.css");
 const sizes = { "index.html": page("template.html", "index.html") };
-for (const p of ["accessibility", "privacy", "terms", "404"]) sizes[p + ".html"] = page(`src/pages/${p}.html`, p + ".html");
+for (const p of ["accessibility", "privacy", "terms", "404", "agent"]) sizes[p + ".html"] = page(`src/pages/${p}.html`, p + ".html");
 
 writeFileSync("docs/favicon.svg", `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32"><path d="M16 2 4 7v8c0 7.5 5 13.2 12 15 7-1.8 12-7.5 12-15V7z" fill="#0E7466"/><path d="m10.5 16 4 4 7-8" stroke="#fff" stroke-width="2.6" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>\n`);
 writeFileSync("docs/manifest.webmanifest", JSON.stringify({ name: "מחירון ביטוח ריסק", short_name: "מחירון ריסק", lang: "he", dir: "rtl", start_url: "./", display: "standalone", background_color: "#F3F6F7", theme_color: "#0E7466", icons: [{ src: "favicon.svg", sizes: "any", type: "image/svg+xml" }] }, null, 1));

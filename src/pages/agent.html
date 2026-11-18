@@ -1,0 +1,48 @@
+<!--HEAD title="כניסת סוכנים – מחירון ביטוח ריסק" desc="אזור הסוכנים: פניות לקוחות, בניית פוליסה ושליחה למפיקים." path="agent.html"-->
+<!--SITEHEADER-->
+<main id="main" class="wrap ag" tabindex="-1">
+  <div id="ag-off" class="auth" hidden><h1>אזור הסוכנים</h1><p>אזור הסוכנים עוד לא חובר למסד הנתונים. אחרי החיבור תופיע כאן כניסה.</p></div>
+
+  <form id="ag-login" class="auth" hidden novalidate>
+    <h1 id="au-h">כניסת סוכנים</h1>
+    <div class="seg" role="group" aria-label="סוג פעולה"><button type="button" data-m="in" aria-pressed="true">כניסה</button><button type="button" data-m="up" aria-pressed="false">הרשמה</button><button type="button" data-m="reset" aria-pressed="false">שכחתי סיסמה</button></div>
+    <label class="field up-only" hidden><span>שם מלא</span><input id="au-name" maxlength="60" autocomplete="name"></label>
+    <label class="field up-only" hidden><span>טלפון</span><input id="au-phone" type="tel" maxlength="14" autocomplete="tel"></label>
+    <label class="field"><span>אימייל</span><input id="au-mail" type="email" maxlength="100" autocomplete="username" required></label>
+    <label class="field pw"><span>סיסמה</span><input id="au-pass" type="password" minlength="8" maxlength="72" autocomplete="current-password" required></label>
+    <p class="perr" id="au-err" role="alert"></p>
+    <button type="submit" class="cta wide" id="au-go">כניסה</button>
+    <p class="mut m0 up-only" hidden>אחרי ההרשמה מנהל המערכת מאשר את החשבון, ורק אז מתחילים לקבל פניות.</p>
+  </form>
+
+  <section id="ag-app" hidden>
+    <div class="ag-top">
+      <h1>שלום, <span id="ag-name"></span> <span class="badge" id="ag-st"></span></h1>
+      <div class="ag-tabs" role="group" aria-label="אזורים">
+        <button type="button" class="btn2" data-t="leads" aria-pressed="true">פניות</button>
+        <button type="button" class="btn2" data-t="prod" aria-pressed="false">מפיקים</button>
+        <button type="button" class="btn2 hide" data-t="team" aria-pressed="false">סוכנים</button>
+        <a class="btn2" href="./">מחירון והקמת פוליסה</a>
+        <button type="button" class="btn2" id="ag-out">יציאה</button>
+      </div>
+    </div>
+    <div id="t-leads">
+      <div class="lacts"><label>סינון: <select id="lf-st"><option value="open">פתוחות</option><option value="all">הכול</option><option value="new">חדשות</option><option value="contacted">בטיפול</option><option value="closed">נסגרו</option><option value="lost">לא רלוונטי</option></select></label><button type="button" class="btn2" id="ag-ref">רענון</button><span class="mut" id="ag-upd"></span></div>
+      <div class="leads" id="leads"></div>
+    </div>
+    <div id="t-prod" hidden>
+      <p class="mut">כתובות המייל של המפיקים בכל חברה, לשליחת בקשות להקמת פוליסה. מנהל המערכת מעדכן את הרשימה.</p>
+      <div id="prod"></div>
+    </div>
+    <div id="t-team" hidden>
+      <p class="mut">הפניות מתחלקות בתור (round-robin) בין הסוכנים הפעילים. סוכן לא פעיל לא מקבל פניות חדשות.</p>
+      <div id="team"></div>
+    </div>
+  </section>
+</main>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+<!--SITEFOOTER-->
+<script src="config.js?v=__VER__"></script>
+<script src="app.js?v=__VER__"></script>
+<script src="agent.js?v=__VER__"></script>
+<!--/HEAD-->
