@@ -270,4 +270,4 @@ main:focus{outline:none}
 :root.a-motion *,:root.a-motion *::before,:root.a-motion *::after{animation:none!important;transition:none!important}
 :root.a-motion .reveal{opacity:1;transform:none}
 @media (prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important}.reveal{opacity:1;transform:none}html{scroll-behavior:auto}}
-@media (max-width:480px){.brand{font-size:.98rem}.brand span{white-space:nowrap}.site-h .top{gap:8px}.tbtns{gap:4px}.tbtns .theme{padding:6px 9px;font-size:.78rem}.bg3d{opacity:.45}}
+@media (max-width:480px){.brand{font-size:.98rem}.brand span{white-space:nowrap}.site-h .top{gap:8px}.tbtns{gap:4px}.tbtns .theme{padding:5px 7px;font-size:.74rem}.brand svg{width:24px;height:24px}.bg3d{opacity:.45}}
