@@ -73,14 +73,6 @@ function renderHome(){
   document.querySelectorAll("#l-s button").forEach(b=>b.setAttribute("aria-pressed",b.dataset.v===state.s));
   document.getElementById("l-sum").value=String(state.sum);
   if(document.getElementById("l-sum").value!==String(state.sum)){const o=document.createElement("option"); o.value=state.sum; o.textContent=fmt(state.sum)+" ₪"; document.getElementById("l-sum").appendChild(o); document.getElementById("l-sum").value=String(state.sum);}
-  const list=compute().sort((a,b)=>(a.dfirst??a.first)-(b.dfirst??b.first)); const have=new Set(list.map(r=>r.name));
-  const cards=list.map((r,i)=>{const d=r.dfirst!=null&&r.dfirst<r.first-.5;
-    return `<div class="cocard${i===0?" best":""}"><span class="rk">${i===0?"הכי זול":i+1}</span>${logo(r.name)}<span class="cn">${r.name}</span>
-      <span class="cp">${d?`<s>${fmt(r.first)}</s>`:""}<b class="num">${fmt(d?r.dfirst:r.first)} ₪</b><small>לחודש${d?" אחרי הנחה":""}</small></span>
-      <button type="button" class="cbtn" data-lead-co="${r.ci}">לשיחה עם סוכן</button></div>`;});
-  COMPANIES.forEach(n=>{if(!have.has(n)) cards.push(`<div class="cocard na">${logo(n)}<span class="cn">${n}</span><span class="cp"><small>אין הצעה לגיל ${state.age}</small></span></div>`);});
-  document.getElementById("cogrid").innerHTML=cards.join("");
-  document.getElementById("g-cap").textContent=`גיל ${state.age}, ${state.g==="m"?"גבר":"אישה"}, ${state.s==="1"?"מעשן":"לא מעשן"}, ${fmt(state.sum)} ₪. מחיר חודשי בשנה הראשונה לפני חיתום.`;
 }
 function render(){
   const home=state.screen==="home";
@@ -345,6 +337,26 @@ try{const o=JSON.parse(sessionStorage.getItem("risk-open-policy")||"null"); sess
   if(o&&isAgent()&&ages.includes(+o.age)){Object.assign(state,{age:+o.age,g:o.g==="f"?"f":"m",s:o.s==="1"?"1":"0",sum:Math.min(5e6,Math.max(1e5,+o.sum||1e6))}); render();
     const ci=COMPANIES.indexOf(clean(o.co)); openPolicy(ci>=0?ci:undefined); $("c-name").value=String(o.name||"").slice(0,60); $("c-phone").value=String(o.phone||"").slice(0,13); $("c-mail").value=String(o.mail||"").slice(0,80);}}catch(e){}
 
+
+// ===== 3D carousel of company logos (no prices on the opening page) =====
+(function carousel(){
+  const ring=document.getElementById("ring"), info=document.getElementById("car-info"); if(!ring) return;
+  const N=COMPANIES.length, step=360/N; let idx=0, paused=false, hover=false;
+  const cards=COMPANIES.map((n,i)=>{const c=document.createElement("button"); c.type="button"; c.className="card3d"; c.tabIndex=-1; c.setAttribute("aria-label",n);
+    if(LOGOS[n]){const im=document.createElement("img"); im.src=LOGOS[n]; im.alt=""; c.appendChild(im);} else {const s=document.createElement("span"); s.className="txt"; s.textContent=n; c.appendChild(s);}
+    c.addEventListener("click",()=>{ if(i===((idx%N)+N)%N) openLead(i); else go2(i);}); ring.appendChild(c); return c;});
+  function layout(){const w=ring.offsetWidth||170, r=Math.round((w/2+14)/Math.tan(Math.PI/N)); cards.forEach((c,i)=>c.style.transform=`rotateY(${i*step}deg) translateZ(${r}px)`); ring.dataset.r=r; place();}
+  function place(){ring.style.transform=`translateZ(${-ring.dataset.r}px) rotateY(${-idx*step}deg)`; const i=((idx%N)+N)%N; cards.forEach((c,j)=>c.classList.toggle("on",j===i));
+    info.textContent=""; const b=document.createElement("b"); b.textContent=COMPANIES[i]; const k=document.createElement("button"); k.type="button"; k.className="linkb"; k.dataset.leadCo=i; k.textContent="לשיחה עם סוכן על "+COMPANIES[i]+" ←"; info.append(b,k);}
+  function go2(i){const cur=((idx%N)+N)%N; let d=i-cur; if(d>N/2) d-=N; if(d<-N/2) d+=N; idx+=d; place();}
+  const still=()=>paused||hover||document.hidden||motionOff()||state.screen!=="home";
+  setInterval(()=>{if(!still()){idx++; place();}},2400);
+  document.getElementById("car-next").addEventListener("click",()=>{idx++; place();});
+  document.getElementById("car-prev").addEventListener("click",()=>{idx--; place();});
+  const pb=document.getElementById("car-pause"); pb.addEventListener("click",()=>{paused=!paused; pb.textContent=paused?"▶":"❚❚"; pb.setAttribute("aria-label",paused?"הפעל סיבוב":"עצור סיבוב");});
+  const car=document.getElementById("carousel"); car.addEventListener("mouseenter",()=>{hover=true;}); car.addEventListener("mouseleave",()=>{hover=false;});
+  window.addEventListener("resize",layout); layout();
+})();
 
 // ===== count-up numbers =====
 document.querySelectorAll(".count").forEach(el=>{const to=+el.dataset.to; if(motionOff()) return; el.textContent="0";

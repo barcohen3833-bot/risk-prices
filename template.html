@@ -4,21 +4,29 @@
   <p class="lede hide" id="lede">השוואת הפרמיה החודשית בביטוח חיים (ריסק) בכל חברות הביטוח, לכל גיל מ-18 עד 69, לפי מין ועישון, כולל ההנחות שבחרת. המחירים לקוחים מהמחשבון הרשמי של רשות שוק ההון.</p>
 
   <section id="home">
-    <div class="hero2">
+    <div class="hero3">
       <div class="h-txt">
         <span class="kicker">עודכן ב-<b id="f-date">__DATE__</b> · מקור: רשות שוק ההון</span>
-        <h2>כמה עולה ביטוח חיים <em>היום</em>?</h2>
-        <p class="sub">המחיר החודשי בכל 11 חברות הביטוח, אחת ליד השנייה. בוחרים חברה ומשאירים פרטים, וסוכן מורשה חוזר אליך עם ההצעה.</p>
+        <h2>ביטוח חיים במחיר הנכון, <em>מכל 11 החברות</em></h2>
+        <p class="sub">משווים את המחיר החודשי בכל חברות הביטוח לפי גיל, מין ועישון, ובוחרים. סוכן מורשה חוזר אליך עם ההצעה, בלי התחייבות.</p>
+        <div class="qcard" role="group" aria-label="פרטי המבוטח">
+          <div class="qrow">
+            <label class="field" for="l-age"><span>גיל</span><select id="l-age"></select></label>
+            <label class="field" for="l-sum"><span>סכום ביטוח</span><select id="l-sum"><option value="500000">500 אלף ₪</option><option value="1000000">מיליון ₪</option><option value="1500000">1.5 מיליון ₪</option><option value="2000000">2 מיליון ₪</option><option value="3000000">3 מיליון ₪</option></select></label>
+          </div>
+          <div class="qrow">
+            <div class="field"><span id="lg-l">מין</span><div class="seg" id="l-g" role="group" aria-labelledby="lg-l"><button type="button" data-v="m" aria-pressed="true">גבר</button><button type="button" data-v="f" aria-pressed="false">אישה</button></div></div>
+            <div class="field"><span id="ls-l">עישון</span><div class="seg" id="l-s" role="group" aria-labelledby="ls-l"><button type="button" data-v="0" aria-pressed="true">לא מעשן</button><button type="button" data-v="1" aria-pressed="false">מעשן</button></div></div>
+          </div>
+          <div class="qacts"><button type="button" class="cta" data-go="c">הצגת המחירים בכל החברות</button><button type="button" class="cta ghost" data-lead>לשיחה עם סוכן</button></div>
+        </div>
       </div>
-      <div class="qbar" role="group" aria-label="פרטי המבוטח">
-        <label class="field" for="l-age"><span>גיל</span><select id="l-age"></select></label>
-        <div class="field"><span id="lg-l">מין</span><div class="seg" id="l-g" role="group" aria-labelledby="lg-l"><button type="button" data-v="m" aria-pressed="true">גבר</button><button type="button" data-v="f" aria-pressed="false">אישה</button></div></div>
-        <div class="field"><span id="ls-l">עישון</span><div class="seg" id="l-s" role="group" aria-labelledby="ls-l"><button type="button" data-v="0" aria-pressed="true">לא מעשן</button><button type="button" data-v="1" aria-pressed="false">מעשן</button></div></div>
-        <label class="field" for="l-sum"><span>סכום ביטוח</span><select id="l-sum"><option value="500000">500 אלף ₪</option><option value="1000000">מיליון ₪</option><option value="1500000">1.5 מיליון ₪</option><option value="2000000">2 מיליון ₪</option><option value="3000000">3 מיליון ₪</option></select></label>
-      </div>
+      <section class="stage" aria-roledescription="קרוסלה" aria-label="חברות הביטוח בהשוואה">
+        <div class="carousel" id="carousel"><div class="ring" id="ring"></div></div>
+        <div class="car-info" id="car-info"></div>
+        <div class="car-ctl"><button type="button" class="btn2" id="car-prev" aria-label="החברה הקודמת">→</button><button type="button" class="btn2" id="car-pause" aria-label="עצור סיבוב">❚❚</button><button type="button" class="btn2" id="car-next" aria-label="החברה הבאה">←</button></div>
+      </section>
     </div>
-    <div class="cogrid" id="cogrid" aria-live="polite"></div>
-    <p class="gnote"><span class="mut" id="g-cap"></span> <button type="button" class="linkb" data-go="c">להשוואה המפורטת ←</button></p>
 
     <div class="tiles">
       <button type="button" class="tile tilt" data-go="m"><b>טבלה לפי גיל</b><span>כל הגילאים מול כל החברות, הזולה בכל גיל מסומנת.</span></button>

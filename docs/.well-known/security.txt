@@ -1,5 +1,5 @@
 Contact: https://github.com/barcohen3833-bot/risk-prices/security/advisories/new
 Contact: https://github.com/barcohen3833-bot/risk-prices/issues
-Expires: 2027-11-18T16:12:55.895Z
+Expires: 2027-11-18T16:19:48.295Z
 Preferred-Languages: he, en
 Canonical: https://barcohen3833-bot.github.io/risk-prices/.well-known/security.txt

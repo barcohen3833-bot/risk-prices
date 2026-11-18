@@ -356,3 +356,29 @@ main:focus{outline:none}
 @media (max-width:640px){.cocard{grid-template-columns:auto 50px 1fr auto auto}.cocard .rk{white-space:nowrap}.cocard .cp{margin-inline-start:6px}}
 @media (max-width:420px){.agent-link .lg{display:none}}
 [hidden]{display:none!important}
+/* ===== opening page v3: form + rotating insurer logos (no prices) ===== */
+.hero3{margin-top:18px;display:grid;grid-template-columns:1fr 1fr;gap:28px;align-items:center}
+.hero3 h2{font-family:var(--font-display);font-size:clamp(1.6rem,3.6vw,2.6rem);line-height:1.12;margin:6px 0 0;letter-spacing:-.01em}
+.hero3 h2 em{font-style:normal;color:var(--accent);display:block}
+.hero3 .sub{color:var(--muted);margin:10px 0 16px;max-width:52ch;font-size:1.02rem}
+.qcard{background:var(--surface);border:1px solid var(--line);border-radius:18px;padding:16px;display:grid;gap:12px;box-shadow:0 18px 40px -26px rgba(20,33,58,.45)}
+.qrow{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.qcard select{font:inherit;color:var(--ink);background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:9px 10px;width:100%}
+.qcard .seg{display:flex}.qcard .seg button{flex:1;padding:9px 6px;white-space:nowrap}
+.qacts{display:grid;grid-template-columns:1.4fr 1fr;gap:10px}.qacts .cta{width:100%;padding:12px 10px}
+.cta.ghost{background:transparent;color:var(--accent);border:2px solid var(--accent)}
+.stage{position:relative;border-radius:24px;padding:18px 10px 14px;background:radial-gradient(120% 90% at 50% 0%,var(--accent-soft),transparent 70%),var(--surface);border:1px solid var(--line);overflow:hidden;box-shadow:0 24px 50px -34px var(--accent)}
+.stage::before{content:"";position:absolute;inset:auto 15% 62px;height:30px;border-radius:50%;background:radial-gradient(closest-side,rgba(14,116,102,.22),transparent);filter:blur(4px)}
+.stage .carousel{height:250px;margin:0}
+.stage .ring{width:190px;height:104px}
+.stage .card3d{border-radius:18px}
+.car-info{display:grid;gap:2px;justify-items:center;min-height:0;margin-top:2px}
+.car-info b{font-size:1.25rem}
+.car-info .linkb{font-size:.9rem}
+.home-page #main{padding-top:0}
+@media (max-width:860px){.hero3{grid-template-columns:1fr;gap:14px}.hero3 .h-txt{display:contents}
+  .hero3 .kicker{order:1;justify-self:start}.hero3 h2{order:2}.hero3 .sub{order:3;margin:0}.stage{order:4}.qcard{order:5}}
+@media (max-width:640px){.hero3{margin-top:10px;gap:10px}.hero3 h2{font-size:1.45rem}.hero3 .sub{display:none}
+  .stage{padding:8px 6px 10px;border-radius:18px}.stage .carousel{height:150px}.stage .ring{width:128px;height:70px}.stage .card3d{padding:8px 12px;border-radius:14px}
+  .car-ctl{display:none}.car-info b{font-size:1.05rem}
+  .qcard{padding:12px;gap:10px}.qrow{gap:8px}.qcard .field>span{font-size:.78rem}.qacts{grid-template-columns:1fr}.qacts .cta{padding:11px}}
