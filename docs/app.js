@@ -341,7 +341,7 @@ try{const o=JSON.parse(sessionStorage.getItem("risk-open-policy")||"null"); sess
 // ===== 3D carousel of company logos (no prices on the opening page) =====
 (function carousel(){
   const ring=document.getElementById("ring"), info=document.getElementById("car-info"); if(!ring) return;
-  const N=COMPANIES.length, step=360/N; let idx=0, paused=false, hover=false;
+  const N=COMPANIES.length, step=360/N; let idx=0, hover=false;
   const cards=COMPANIES.map((n,i)=>{const c=document.createElement("button"); c.type="button"; c.className="card3d"; c.tabIndex=-1; c.setAttribute("aria-label",n);
     if(LOGOS[n]){const im=document.createElement("img"); im.src=LOGOS[n]; im.alt=""; c.appendChild(im);} else {const s=document.createElement("span"); s.className="txt"; s.textContent=n; c.appendChild(s);}
     c.addEventListener("click",()=>{ if(i===((idx%N)+N)%N) openLead(i); else go2(i);}); ring.appendChild(c); return c;});
@@ -349,11 +349,8 @@ try{const o=JSON.parse(sessionStorage.getItem("risk-open-policy")||"null"); sess
   function place(){ring.style.transform=`translateZ(${-ring.dataset.r}px) rotateY(${-idx*step}deg)`; const i=((idx%N)+N)%N; cards.forEach((c,j)=>c.classList.toggle("on",j===i));
     info.textContent=""; const b=document.createElement("b"); b.textContent=COMPANIES[i]; const k=document.createElement("button"); k.type="button"; k.className="linkb"; k.dataset.leadCo=i; k.textContent="לשיחה עם סוכן על "+COMPANIES[i]+" ←"; info.append(b,k);}
   function go2(i){const cur=((idx%N)+N)%N; let d=i-cur; if(d>N/2) d-=N; if(d<-N/2) d+=N; idx+=d; place();}
-  const still=()=>paused||hover||document.hidden||motionOff()||state.screen!=="home";
+  const still=()=>hover||document.hidden||motionOff()||state.screen!=="home";
   setInterval(()=>{if(!still()){idx++; place();}},2400);
-  document.getElementById("car-next").addEventListener("click",()=>{idx++; place();});
-  document.getElementById("car-prev").addEventListener("click",()=>{idx--; place();});
-  const pb=document.getElementById("car-pause"); pb.addEventListener("click",()=>{paused=!paused; pb.textContent=paused?"▶":"❚❚"; pb.setAttribute("aria-label",paused?"הפעל סיבוב":"עצור סיבוב");});
   const car=document.getElementById("carousel"); car.addEventListener("mouseenter",()=>{hover=true;}); car.addEventListener("mouseleave",()=>{hover=false;});
   window.addEventListener("resize",layout); layout();
 })();

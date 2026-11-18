@@ -382,3 +382,75 @@ main:focus{outline:none}
   .stage{padding:8px 6px 10px;border-radius:18px}.stage .carousel{height:150px}.stage .ring{width:128px;height:70px}.stage .card3d{padding:8px 12px;border-radius:14px}
   .car-ctl{display:none}.car-info b{font-size:1.05rem}
   .qcard{padding:12px;gap:10px}.qrow{gap:8px}.qcard .field>span{font-size:.78rem}.qacts{grid-template-columns:1fr}.qacts .cta{padding:11px}}
+/* ===== design v2: deep navy→teal hero band, unified accent, icon tiles, dark footer ===== */
+:root{--bg:#F4F7FA;--ink:#0B1B33;--muted:#526079;--line:#DCE3EA;--accent:#0E7466;--accent-2:#14A38F;--accent-soft:#DDF3EE;
+  --band:linear-gradient(135deg,#0A1830 0%,#0C2E45 48%,#0B5F58 100%);--band-ink:#F3F8FB;--band-mut:#B9C8D6;--band-hi:#5EE6CF;
+  --shadow:0 1px 2px rgba(11,27,51,.06),0 14px 34px -20px rgba(11,27,51,.35)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0B121B;--surface:#131D29;--line:#243241;--accent:#2EC4AE;--accent-2:#45D6C0;--accent-soft:#12332E;
+  --band:linear-gradient(135deg,#07101D 0%,#0A2234 50%,#0A4740 100%);--shadow:0 14px 34px -20px rgba(0,0,0,.7)}}
+:root[data-theme="dark"]{--bg:#0B121B;--surface:#131D29;--line:#243241;--accent:#2EC4AE;--accent-2:#45D6C0;--accent-soft:#12332E;
+  --band:linear-gradient(135deg,#07101D 0%,#0A2234 50%,#0A4740 100%);--shadow:0 14px 34px -20px rgba(0,0,0,.7)}
+:root.a-contrast{--band:#000;--band-ink:#fff;--band-mut:#fff;--band-hi:#ffeb3b}
+body{overflow-x:clip}
+/* one accent everywhere: selected segments/tabs use the accent, not navy */
+.seg button[aria-pressed="true"],.tabs button[aria-pressed="true"]{background:var(--accent);color:#fff}
+.cta{background:linear-gradient(135deg,var(--accent),var(--accent-2));color:#fff;border-radius:12px;box-shadow:0 10px 24px -12px var(--accent)}
+.cta.ghost{background:transparent;color:var(--accent);border:2px solid var(--accent);box-shadow:none}
+.cta.ghost:hover{background:var(--accent-soft)}
+/* hero band (full-bleed behind the hero) */
+#home{position:relative;isolation:isolate}
+.hero3{position:relative;margin-top:0;padding-block:34px 40px}
+.hero3::before{content:"";position:absolute;z-index:-1;inset:-28px calc(50% - 50vw) 0;background:radial-gradient(60% 80% at 15% 20%,rgba(94,230,207,.18),transparent 60%),radial-gradient(50% 70% at 90% 100%,rgba(20,163,143,.25),transparent 65%),var(--band)}
+.hero3::after{content:"";position:absolute;z-index:-1;inset:auto calc(50% - 50vw) 0;height:1px;background:linear-gradient(90deg,transparent,rgba(94,230,207,.5),transparent)}
+.hero3 h2{color:var(--band-ink);font-size:clamp(1.7rem,3.8vw,2.85rem)}
+.hero3 h2 em{color:var(--band-hi)}
+.hero3 .sub{color:var(--band-mut)}
+.hero3 .kicker{background:rgba(255,255,255,.1);color:#CDF7EE;border:1px solid rgba(255,255,255,.14)}
+.hero3 .kicker b{color:#fff}
+.qcard{border:0;border-radius:20px;padding:18px;box-shadow:0 30px 60px -30px rgba(0,0,0,.6),0 0 0 1px rgba(255,255,255,.06)}
+.qcard .field>span{color:var(--muted);font-weight:700}
+.qacts .cta{font-size:1.02rem}
+/* carousel stage: glass panel on the band */
+.stage{background:linear-gradient(180deg,rgba(255,255,255,.09),rgba(255,255,255,.03));border:1px solid rgba(255,255,255,.14);box-shadow:inset 0 1px 0 rgba(255,255,255,.12),0 30px 60px -34px rgba(0,0,0,.7);backdrop-filter:blur(6px);padding:22px 10px 20px}
+.stage::before{background:radial-gradient(closest-side,rgba(94,230,207,.35),transparent);bottom:64px}
+.stage .card3d{border:0;box-shadow:0 20px 40px -18px rgba(0,0,0,.65)}
+.stage .card3d.on{box-shadow:0 0 0 3px rgba(94,230,207,.55),0 24px 50px -16px rgba(0,0,0,.7)}
+.car-info b{color:var(--band-ink)}
+.car-info .linkb{color:var(--band-hi)}
+.car-info .linkb:hover{text-decoration:underline}
+/* tiles with icons */
+.tiles{margin-top:34px;gap:14px}
+.tile{border:1px solid var(--line);border-radius:16px;padding:18px;box-shadow:var(--shadow);transition:transform .2s,border-color .2s,box-shadow .2s}
+.tile:hover{border-color:var(--accent);transform:translateY(-3px)}
+.ti{display:grid;place-items:center;width:42px;height:42px;border-radius:12px;background:var(--accent-soft);color:var(--accent);margin-bottom:10px}
+.ti svg{width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+/* how it works */
+.sec-h{font-size:1.55rem;margin-top:48px}
+.features ul{gap:14px}
+.features li{border:1px solid var(--line);border-top:0;border-radius:16px;padding:18px;box-shadow:var(--shadow);position:relative;overflow:hidden}
+.features li::before{content:"";position:absolute;inset:0 0 auto;height:4px;background:linear-gradient(90deg,var(--accent),var(--accent-2))}
+/* footer */
+.site-f{background:#0A1830;border-top:0;margin-top:56px}
+.site-f .wrap{color:#A9B7C7}
+.site-f a{color:#6FE3CF}
+.site-f b{color:#E6EEF5}
+.site-f .mut{color:#7F90A4}
+/* header pills */
+.site-h .theme{border-color:var(--line);transition:border-color .2s,color .2s}
+.site-h .theme:hover{border-color:var(--accent);color:var(--accent)}
+@media (max-width:860px){.hero3{padding-block:22px 26px}}
+@media (max-width:640px){.hero3{padding-block:14px 18px}.hero3::before{inset-block-start:-28px}.stage{padding:10px 6px 12px}.tiles{margin-top:22px}.qcard{padding:14px}}
+/* v2 fixes: readable text on the accent in dark mode; header matches the hero band */
+:root{--on-accent:#fff}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--on-accent:#04211D}}
+:root[data-theme="dark"]{--on-accent:#04211D}
+.cta,.seg button[aria-pressed="true"],.tabs button[aria-pressed="true"],.ages button[aria-pressed="true"]{color:var(--on-accent)}
+.cta.ghost{color:var(--accent)}
+.site-h{background:rgba(10,24,48,.94);border-bottom:1px solid rgba(255,255,255,.08)}
+:root.a-contrast .site-h{background:#000}
+.site-h .brand{color:#F3F8FB}
+.site-h .brand path:first-child{fill:#2EC4AE}
+.site-h .theme{background:rgba(255,255,255,.07);border-color:rgba(255,255,255,.16);color:#E6EEF5}
+.site-h .theme:hover{border-color:#5EE6CF;color:#5EE6CF}
+.site-h .a11y{background:var(--surface)}
+.site-f{margin-top:24px}
