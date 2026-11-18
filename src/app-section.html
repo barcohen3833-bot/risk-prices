@@ -1,0 +1,40 @@
+<div id="app" class="hide">
+  <div class="tabs" role="group" aria-label="תצוגה"><button type="button" id="tab-m" aria-pressed="true">טבלה לפי גיל</button><button type="button" id="tab-t" aria-pressed="false">מגמת מחירים</button><button type="button" id="tab-c" aria-pressed="false">השוואה מפורטת לגיל</button><button type="button" id="tab-d" aria-pressed="false">הנחות</button></div>
+  <section class="controls" aria-label="פרטי המבוטח">
+    <label class="field" for="age"><span>גיל המבוטח</span><select id="age"></select></label>
+    <div class="field"><span id="g-l">מין</span><div class="seg" id="gender" role="group" aria-labelledby="g-l"><button type="button" data-v="m" aria-pressed="true">גבר</button><button type="button" data-v="f" aria-pressed="false">אישה</button></div></div>
+    <div class="field"><span id="s-l">עישון</span><div class="seg" id="smoke" role="group" aria-labelledby="s-l"><button type="button" data-v="0" aria-pressed="true">לא מעשן</button><button type="button" data-v="1" aria-pressed="false">מעשן</button></div></div>
+    <label class="field" for="sum"><span>סכום ביטוח (₪)</span><input id="sum" type="number" min="100000" max="5000000" step="50000" value="1000000" inputmode="numeric">
+      <div class="presets"><button type="button" data-s="500000">500 אלף</button><button type="button" data-s="1000000">מיליון</button><button type="button" data-s="2000000">2 מיליון</button><button type="button" data-s="3000000">3 מיליון</button></div></label>
+    <label class="field" for="sort"><span>מיון לפי</span><select id="sort"><option value="total">עלות כוללת לתקופה</option><option value="first">פרמיה בשנה הראשונה</option><option value="disc">עלות אחרי הנחה</option></select></label>
+    <div class="field"><span id="h-l">תקופה</span><div class="seg" id="horizon" role="group" aria-labelledby="h-l"><button type="button" data-v="10" aria-pressed="false">10 שנים</button><button type="button" data-v="20" aria-pressed="true">20 שנה</button></div></div>
+    <div class="field"><span id="u-l">מחיר מוצג</span><div class="seg" id="unit" role="group" aria-labelledby="u-l"><button type="button" data-v="m" aria-pressed="true">לחודש</button><button type="button" data-v="y" aria-pressed="false">לשנה</button></div></div>
+  </section>
+
+  <section id="matrix">
+    <div class="mctl"><span class="mnote m0">הערכים בטבלה:</span>
+      <select id="metric" aria-label="מדד"><option value="first">פרמיה בשנה הראשונה</option><option value="dfirst">שנה ראשונה אחרי הנחה</option><option value="avg">ממוצע לתקופה</option><option value="total">סה״כ לתקופה</option></select></div>
+    <div class="mwrap"><table class="m" id="mtable"></table></div>
+    <p class="mnote" id="mcap"></p>
+    <p class="mnote">הזול בכל גיל מסומן בצבע. מחירי מחירון לפני הנחה, למין, עישון וסכום הביטוח שנבחרו למעלה. לחיצה על שורה פותחת השוואה מפורטת לאותו גיל, כולל הנחות. "—" מסמן שהחברה לא מציעה ביטוח ל-20 שנה בגיל הזה.</p>
+  </section>
+
+  <section id="trend" class="hide">
+    <p class="mnote mt16" id="tcap"></p>
+    <div class="mwrap"><table class="m t" id="ttable"></table></div>
+    <p class="mnote">בכל תא: המחיר, ומתחתיו השינוי באחוזים לעומת השנה הקודמת (▲ עלייה, ▼ ירידה). השורה האחרונה היא השינוי המצטבר מהשנה הראשונה עד האחרונה. הגיל מתקדם עם השנים, ולכן בדרך כלל המחיר עולה, אבל אצל חלק מהחברות יש גם ירידות. הגיל הראשון נבחר למעלה.</p>
+  </section>
+
+  <div id="compare" class="hide">
+  <section class="summary" id="summary" aria-live="polite"></section>
+
+  <div class="listhead" aria-hidden="true"><span>#</span><span>חברה</span><span>שנה ראשונה</span><span>שנה ראשונה אחרי הנחה</span><span id="lh-avg">ממוצע חודשי</span><span id="lh-total">סה״כ ל-20 שנה</span><span></span></div>
+  <div class="rows" id="rows"></div>
+  </div>
+
+  <section id="discounts" class="hide" aria-labelledby="d-h">
+    <div class="dhead"><div><h2 id="d-h">אחוזי הנחה לכל חברה</h2><p class="mnote">בוחרים אחוז הנחה ולכמה שנים הוא חל. ההנחות נשמרות במכשיר הזה בלבד ומשפיעות על כל הטבלאות, המיון וטופס הקמת הפוליסה.</p></div>
+      <div class="dall"><label>לכל החברות <input type="number" id="d-all" min="0" max="90" step="1" value="0" inputmode="numeric" aria-label="אחוז הנחה לכל החברות">%</label><button type="button" class="btn2" id="d-apply">החל</button><button type="button" class="btn2" id="d-pub">מבצעים שפורסמו</button><button type="button" class="btn2" id="d-reset">אפס הכל</button></div></div>
+    <div class="dlist" id="dlist"></div>
+  </section>
+</div>

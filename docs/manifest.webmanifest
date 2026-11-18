@@ -1,0 +1,17 @@
+{
+ "name": "מחירון ביטוח ריסק",
+ "short_name": "מחירון ריסק",
+ "lang": "he",
+ "dir": "rtl",
+ "start_url": "./",
+ "display": "standalone",
+ "background_color": "#F3F6F7",
+ "theme_color": "#0E7466",
+ "icons": [
+  {
+   "src": "favicon.svg",
+   "sizes": "any",
+   "type": "image/svg+xml"
+  }
+ ]
+}
