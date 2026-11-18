@@ -27,7 +27,7 @@ let cfg = {}; try { cfg = JSON.parse(read("config.json")); } catch {}
 const sbUrl = /^https:\/\/[a-z0-9-]+\.supabase\.co$/.test(cfg.supabaseUrl || "") ? cfg.supabaseUrl : "";
 const sbKey = sbUrl && /^[A-Za-z0-9._-]{20,400}$/.test(cfg.supabaseKey || "") ? cfg.supabaseKey : "";
 const configJs = "window.RISK_SB=" + JSON.stringify(sbKey ? { url: sbUrl, key: sbKey } : null) + ";\n";
-const ver = createHash("sha256").update(dataJs + configJs + read("src/app.js") + read("src/agent.js") + read("src/app.css") + read("template.html")).digest("hex").slice(0, 10);
+const ver = createHash("sha256").update(dataJs + configJs + read("src/app.js") + read("src/agent.js") + read("src/app.css") + read("template.html") + read("src/guilloche.svg")).digest("hex").slice(0, 10);
 
 // ---- security headers that a static host allows via <meta> (GitHub Pages can't set real headers) ----
 const CSP = ["default-src 'none'", "script-src 'self'", "style-src 'self' https://fonts.googleapis.com",
@@ -68,10 +68,10 @@ ${outName === "agent.html" ? '<meta name="robots" content="noindex">\n' : ""}<me
 <meta name="description" content="${desc}">
 <link rel="canonical" href="${url}">
 <meta property="og:type" content="website"><meta property="og:locale" content="he_IL"><meta property="og:title" content="${title}"><meta property="og:description" content="${desc}"><meta property="og:url" content="${url}">
-<meta name="theme-color" content="#0E7466">
+<meta name="theme-color" content="#8E2F3F">
 <link rel="icon" href="favicon.svg" type="image/svg+xml"><link rel="manifest" href="manifest.webmanifest">
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Assistant:wght@400;600;700&family=Rubik:wght@500;700&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Frank+Ruhl+Libre:wght@500;700;900&family=IBM+Plex+Sans+Hebrew:wght@400;500;600;700&display=swap">
 <link rel="stylesheet" href="app.css?v=${ver}">
 </head><body${outName === "index.html" ? ' class="home-page"' : ""}>
 ${t.split("__DATE__").join(date).split("__VER__").join(ver)}
@@ -88,11 +88,12 @@ writeFileSync("docs/config.js", configJs);
 copyFileSync("src/agent.js", "docs/agent.js");
 copyFileSync("src/app.js", "docs/app.js");
 copyFileSync("src/app.css", "docs/app.css");
+copyFileSync("src/guilloche.svg", "docs/guilloche.svg");
 const sizes = { "index.html": page("template.html", "index.html") };
 for (const p of ["accessibility", "privacy", "terms", "404", "agent"]) sizes[p + ".html"] = page(`src/pages/${p}.html`, p + ".html");
 
-writeFileSync("docs/favicon.svg", `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32"><path d="M16 2 4 7v8c0 7.5 5 13.2 12 15 7-1.8 12-7.5 12-15V7z" fill="#0E7466"/><path d="m10.5 16 4 4 7-8" stroke="#fff" stroke-width="2.6" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>\n`);
-writeFileSync("docs/manifest.webmanifest", JSON.stringify({ name: "מחירון ביטוח ריסק", short_name: "מחירון ריסק", lang: "he", dir: "rtl", start_url: "./", display: "standalone", background_color: "#F3F6F7", theme_color: "#0E7466", icons: [{ src: "favicon.svg", sizes: "any", type: "image/svg+xml" }] }, null, 1));
+writeFileSync("docs/favicon.svg", `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32"><path d="M16 2 4 7v8c0 7.5 5 13.2 12 15 7-1.8 12-7.5 12-15V7z" fill="#8E2F3F"/><path d="m10.5 16 4 4 7-8" stroke="#fff" stroke-width="2.6" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>\n`);
+writeFileSync("docs/manifest.webmanifest", JSON.stringify({ name: "מחירון ביטוח ריסק", short_name: "מחירון ריסק", lang: "he", dir: "rtl", start_url: "./", display: "standalone", background_color: "#F6F1E7", theme_color: "#8E2F3F", icons: [{ src: "favicon.svg", sizes: "any", type: "image/svg+xml" }] }, null, 1));
 writeFileSync("docs/robots.txt", `User-agent: *\nAllow: /\nSitemap: ${SITE}sitemap.xml\n`);
 const today = new Date().toISOString().slice(0, 10);
 writeFileSync("docs/sitemap.xml", `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${["", "accessibility.html", "privacy.html", "terms.html"].map(p => `<url><loc>${SITE}${p}</loc><lastmod>${today}</lastmod></url>`).join("\n")}\n</urlset>\n`);

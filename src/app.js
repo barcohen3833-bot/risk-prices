@@ -347,7 +347,7 @@ try{const o=JSON.parse(sessionStorage.getItem("risk-open-policy")||"null"); sess
     c.addEventListener("click",()=>{ if(i===((idx%N)+N)%N) openLead(i); else go2(i);}); ring.appendChild(c); return c;});
   function layout(){const w=ring.offsetWidth||170, r=Math.round((w/2+14)/Math.tan(Math.PI/N)); cards.forEach((c,i)=>c.style.transform=`rotateY(${i*step}deg) translateZ(${r}px)`); ring.dataset.r=r; place();}
   function place(){ring.style.transform=`translateZ(${-ring.dataset.r}px) rotateY(${-idx*step}deg)`; const i=((idx%N)+N)%N; cards.forEach((c,j)=>c.classList.toggle("on",j===i));
-    info.textContent=""; const b=document.createElement("b"); b.textContent=COMPANIES[i]; const k=document.createElement("button"); k.type="button"; k.className="linkb"; k.dataset.leadCo=i; k.textContent="לשיחה עם סוכן על "+COMPANIES[i]+" ←"; info.append(b,k);}
+    info.textContent=""; const b=document.createElement("b"); b.textContent=COMPANIES[i]; const k=document.createElement("button"); k.type="button"; k.className="linkb"; k.dataset.leadCo=i; k.textContent="לשיחה עם סוכן על "+COMPANIES[i]; info.append(b,k);}
   function go2(i){const cur=((idx%N)+N)%N; let d=i-cur; if(d>N/2) d-=N; if(d<-N/2) d+=N; idx+=d; place();}
   const still=()=>hover||document.hidden||motionOff()||state.screen!=="home";
   setInterval(()=>{if(!still()){idx++; place();}},2400);
