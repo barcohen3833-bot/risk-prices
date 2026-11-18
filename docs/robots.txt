@@ -1,0 +1,3 @@
+User-agent: *
+Allow: /
+Sitemap: https://barcohen3833-bot.github.io/risk-prices/sitemap.xml

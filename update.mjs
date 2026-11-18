@@ -1,5 +1,5 @@
 // Pulls life-insurance (risk) premiums for ages 18-69 from the Capital Market Authority calculator,
-// plus company logos, then builds docs/index.html. Runs slowly on purpose: the site blocks fast bursts.
+// plus company logos, then builds the site into docs/ (tools/build.mjs). Runs slowly on purpose: the site blocks fast bursts.
 import { readFileSync, writeFileSync, mkdirSync } from "node:fs";
 const BASE = "https://life.cma.gov.il";
 const sleep = ms => new Promise(r => setTimeout(r, ms));
@@ -14,7 +14,7 @@ async function calc(age, gender, smoking) {
     ListOfTracks:[], DesiredSum:1000000, DesiredPeriod:20, SortField:"", SortDirection:"asc" };
   for (let k = 0; k < 4; k++) {
     try {
-      const r = await fetch(BASE + "/RiskParameters/CalculateRiskRates", { method:"POST", headers:{ "Content-Type":"application/json", "User-Agent":"Mozilla/5.0", "X-Requested-With":"XMLHttpRequest" }, body: JSON.stringify(body) });
+      const r = await fetch(BASE + "/RiskParameters/CalculateRiskRates", { method:"POST", headers:{ "Content-Type":"application/json", "User-Agent":"risk-prices-updater (+https://github.com/barcohen3833-bot/risk-prices)", "X-Requested-With":"XMLHttpRequest" }, body: JSON.stringify(body) });
       const html = await r.text();
       const tag = html.match(/<[^>]*id="graphInfo"[^>]*>/);
       const m = tag && tag[0].match(/data-graphresults="([^"]*)"/);
@@ -45,18 +45,5 @@ if (filled < 150) { console.error("too few profiles (" + filled + "), keeping ol
 writeFileSync("data.json", JSON.stringify({ fetchedAt: today.toISOString(), prices: out, logos: logoData }));
 console.log("\nok", filled, "profiles");
 
-// ---- build the page from template.html (discounts live inside it, block DISCOUNTS) ----
-const comp = [], D = {};
-for (const [k, rows] of Object.entries(out).sort((a, b) => parseInt(a[0]) - parseInt(b[0]))) {
-  if (!rows.length) continue;
-  D[k] = rows.map(([name, arr]) => { if (!comp.includes(name)) comp.push(name); return [comp.indexOf(name), arr]; });
-}
-const date = today.toLocaleDateString("he-IL", { timeZone: "Asia/Jerusalem" });
-let t = readFileSync("template.html", "utf8");
-t = t.replace("__DATA__", () => JSON.stringify(D)).replace("__COMPANIES__", () => JSON.stringify(comp))
-     .replace("__LOGOS__", () => JSON.stringify(logoData)).split("__DATE__").join(date);
-const i = t.indexOf('<div class="wrap"');
-const html = "<!doctype html>\n<html lang=\"he\" dir=\"rtl\"><head><meta charset=\"utf-8\"><meta name=\"viewport\" content=\"width=device-width,initial-scale=1,viewport-fit=cover\">\n" + t.slice(0, i) + "</head><body>\n" + t.slice(i) + "</body></html>";
-mkdirSync("docs", { recursive: true });
-writeFileSync("docs/index.html", html);
-console.log("built docs/index.html", html.length, "bytes");
+// ---- build the site (docs/) ----
+await import("./tools/build.mjs");
