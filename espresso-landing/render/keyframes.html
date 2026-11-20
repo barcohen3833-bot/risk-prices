@@ -1,0 +1,54 @@
+<!doctype html>
+<html><head><meta charset="utf-8"><style>html,body{margin:0;background:#000;overflow:hidden}canvas{display:block}</style></head>
+<body><canvas id="c"></canvas>
+<script>
+// Scroll sequence built from four Higgsfield keyframes of the same machine:
+// k1 machine → k2 cup in place (same framing) → k3 pour (close) → k4 full cup + steam.
+const P = new URLSearchParams(location.search);
+const W = +P.get('w') || 1920, H = +P.get('h') || 1080;
+const c = document.getElementById('c'); c.width = W; c.height = H;
+const g = c.getContext('2d');
+const imgs = ['k1', 'k2', 'k3', 'k4'].map(n => { const i = new Image(); i.src = 'keyframes/' + n + '.jpg'; return i; });
+const clamp = (v, a = 0, b = 1) => Math.max(a, Math.min(b, v));
+const seg = (t, a, b) => clamp((t - a) / (b - a));
+const ease = t => t < 0.5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2;
+const easeIn = t => t * t * t;
+const lerp = (a, b, k) => a + (b - a) * k;
+
+// draw image as cover, zoomed by s around focal point (fx, fy) (0..1 of the image),
+// keeping that point where it sits in the un-zoomed frame
+function draw(img, alpha, s, fx, fy, blur = 0) {
+  if (alpha <= 0) return;
+  const base = Math.max(W / img.naturalWidth, H / img.naturalHeight);
+  const bw = img.naturalWidth * base, bh = img.naturalHeight * base;
+  const ox = (W - bw) / 2, oy = (H - bh) / 2;
+  const sx = ox + fx * bw, sy = oy + fy * bh;           // focal point on screen
+  const dw = bw * s, dh = bh * s;
+  let x = sx - fx * dw, y = sy - fy * dh;
+  x = Math.min(0, Math.max(W - dw, x)); y = Math.min(0, Math.max(H - dh, y));
+  g.globalAlpha = alpha;
+  g.filter = blur > 0.2 ? `blur(${blur}px)` : 'none';
+  g.drawImage(img, x, y, dw, dh);
+  g.filter = 'none'; g.globalAlpha = 1;
+}
+
+window.renderAt = (t) => {
+  g.fillStyle = '#000'; g.fillRect(0, 0, W, H);
+  const [k1, k2, k3, k4] = imgs;
+  // k1/k2 share framing: one continuous slow push-in, then a fast push towards the cup
+  const slow = lerp(1, 1.12, ease(seg(t, 0, 0.42)));
+  const fast = lerp(1, 2.3, easeIn(seg(t, 0.42, 0.56)));
+  const s12 = slow * fast;
+  const cupIn = ease(seg(t, 0.2, 0.36));                  // cup fades in
+  const toPour = ease(seg(t, 0.5, 0.58));                 // cut into the pour shot
+  const toFull = ease(seg(t, 0.76, 0.86));                // pour → full cup
+  draw(k1, 1 - toPour, s12, 0.36, 0.6, 0);
+  draw(k2, cupIn * (1 - toPour), s12, 0.36, 0.6, 0);
+  const s3 = lerp(1.12, 1.0, ease(seg(t, 0.5, 0.62))) * lerp(1, 1.07, seg(t, 0.62, 0.86));
+  draw(k3, toPour * (1 - toFull), s3, 0.33, 0.62, (1 - toPour) * 6);
+  const s4 = lerp(1.04, 1.12, ease(seg(t, 0.76, 1)));
+  draw(k4, toFull, s4, 0.42, 0.6, (1 - toFull) * 4);
+  return true;
+};
+Promise.all(imgs.map(i => i.decode())).then(() => { window.renderAt(0); window.ready = true; });
+</script></body></html>

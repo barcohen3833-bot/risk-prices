@@ -10,7 +10,7 @@ const { chromium } = require('playwright');
 const root = path.dirname(new URL(import.meta.url).pathname);
 const [out = 'png', N = '144', W = '1920', H = '1080', only] = process.argv.slice(2);
 fs.mkdirSync(out, { recursive: true });
-const types = { '.html': 'text/html', '.js': 'text/javascript' };
+const types = { '.html': 'text/html', '.js': 'text/javascript', '.jpg': 'image/jpeg' };
 const srv = http.createServer((req, res) => {
   const p = path.join(root, decodeURIComponent(req.url.split('?')[0]));
   if (!p.startsWith(root) || !fs.existsSync(p)) { res.writeHead(404); return res.end(); }
@@ -23,7 +23,7 @@ const browser = await chromium.launch({ args: ['--use-gl=angle', '--use-angle=sw
 const page = await browser.newPage({ viewport: { width: +W, height: +H } });
 page.on('console', m => console.log('[page]', m.text()));
 page.on('pageerror', e => console.log('[err]', e.message));
-await page.goto(`http://localhost:${port}/scene.html?w=${W}&h=${H}`);
+await page.goto(`http://localhost:${port}/${process.env.SCENE || "scene.html"}?w=${W}&h=${H}`);
 await page.waitForFunction(() => window.ready, null, { timeout: 60000 });
 const ts = only ? only.split(',').map(Number) : [...Array(+N).keys()].map(i => i / (+N - 1));
 let i = 0;

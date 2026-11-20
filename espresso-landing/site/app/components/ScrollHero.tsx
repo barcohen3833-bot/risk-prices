@@ -6,7 +6,7 @@ import { FRAME_COUNT } from '../frames';
 import { brand } from '../brand';
 
 // Horizontal position of the product in the frames (0–1); kept centred when the sides are cropped.
-const SUBJECT_X = 0.36;
+const SUBJECT_X = 0.3;
 const framePath =(i: number) => `frames/frame_${String(i + 1).padStart(4, '0')}.jpg`;
 
 const fade = (delay: number) => ({
