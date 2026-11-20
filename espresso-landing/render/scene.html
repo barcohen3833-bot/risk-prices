@@ -1,0 +1,201 @@
+<!doctype html>
+<html><head><meta charset="utf-8"><style>html,body{margin:0;background:#000;overflow:hidden}canvas{display:block}</style>
+<script type="importmap">{"imports":{"three":"/node_modules/three/build/three.module.js","three/addons/":"/node_modules/three/examples/jsm/"}}</script>
+</head><body>
+<script type="module">
+// Original espresso machine (fictional brand "Calore"): machine → cup slides in → coffee pours.
+import * as THREE from 'three';
+import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
+import { RoundedBoxGeometry } from 'three/addons/geometries/RoundedBoxGeometry.js';
+
+const P = new URLSearchParams(location.search);
+const W = +P.get('w') || 1920, H = +P.get('h') || 1080;
+const renderer = new THREE.WebGLRenderer({ antialias: true, preserveDrawingBuffer: true });
+renderer.setPixelRatio(1);
+renderer.setSize(W, H);
+renderer.toneMapping = THREE.ACESFilmicToneMapping;
+renderer.toneMappingExposure = 1.0;
+renderer.outputColorSpace = THREE.SRGBColorSpace;
+document.body.appendChild(renderer.domElement);
+
+const scene = new THREE.Scene();
+scene.background = new THREE.Color(0x000000);
+const pmrem = new THREE.PMREMGenerator(renderer);
+scene.environment = pmrem.fromScene(new RoomEnvironment(), 0.04).texture;
+scene.environmentIntensity = 0.7;
+
+const camera = new THREE.PerspectiveCamera(30, W / H, 0.05, 100);
+// Subject sits left of centre: the Hebrew copy is right-aligned (?shift=0.14 moves it right instead).
+const SHIFT = P.has('shift') ? +P.get('shift') : -0.14;
+camera.setViewOffset(W, H, -Math.round(W * SHIFT), 0, W, H);
+
+const key = new THREE.DirectionalLight(0xfff0dc, 2.4); key.position.set(-5, 8, 7); scene.add(key);
+const rim = new THREE.DirectionalLight(0xffc98a, 2.2); rim.position.set(6, 4, -6); scene.add(rim);
+const fill = new THREE.DirectionalLight(0xffffff, 0.45); fill.position.set(4, -2, 6); scene.add(fill);
+const cupLight = new THREE.PointLight(0xffd6a0, 0, 4, 2); cupLight.position.set(0.4, 1.6, 1.6); scene.add(cupLight);
+
+// ---------- materials
+const body = new THREE.MeshPhysicalMaterial({ color: 0x17130f, metalness: 0.55, roughness: 0.32, clearcoat: 0.6, clearcoatRoughness: 0.25 });
+const brass = new THREE.MeshStandardMaterial({ color: 0xd2ad72, metalness: 1, roughness: 0.22 });
+const chrome = new THREE.MeshStandardMaterial({ color: 0xd8dadf, metalness: 1, roughness: 0.12 });
+const darkChrome = new THREE.MeshStandardMaterial({ color: 0x55585e, metalness: 1, roughness: 0.3 });
+const porcelain = new THREE.MeshPhysicalMaterial({ color: 0xf6f2ec, roughness: 0.18, clearcoat: 1, clearcoatRoughness: 0.08 });
+const coffeeMat = new THREE.MeshPhysicalMaterial({ color: 0x5a2a0e, roughness: 0.08, clearcoat: 1, metalness: 0, transparent: true, opacity: 0.96 });
+const glow = new THREE.MeshStandardMaterial({ color: 0x000000, emissive: 0xffc27a, emissiveIntensity: 2.2 });
+
+// ---------- machine (faces +z, floor at y = 0)
+const machine = new THREE.Group(); scene.add(machine);
+const add = (geo, mat, x, y, z, parent = machine) => { const m = new THREE.Mesh(geo, mat); m.position.set(x, y, z); parent.add(m); return m; };
+
+add(new RoundedBoxGeometry(1.55, 0.26, 2.7, 4, 0.08), body, 0, 0.13, 0.1);           // base
+add(new RoundedBoxGeometry(1.45, 3.0, 1.45, 6, 0.28), body, 0, 1.75, -0.55);        // column
+add(new RoundedBoxGeometry(1.45, 0.78, 1.25, 6, 0.26), body, 0, 2.86, 0.45);        // head
+// brass seam around the head
+add(new RoundedBoxGeometry(1.47, 0.045, 1.27, 4, 0.02), brass, 0, 2.62, 0.45);
+// brass lever on top
+const lever = new THREE.Mesh(new THREE.TorusGeometry(0.42, 0.045, 16, 64, Math.PI), brass);
+lever.rotation.set(-Math.PI / 2 + 0.35, 0, 0); lever.position.set(0, 3.27, 0.25); machine.add(lever);
+add(new THREE.CylinderGeometry(0.05, 0.05, 0.12, 24), brass, -0.42, 3.27, 0.25);
+add(new THREE.CylinderGeometry(0.05, 0.05, 0.12, 24), brass, 0.42, 3.27, 0.25);
+// two glowing buttons on the head front
+for (const x of [-0.18, 0.18]) {
+  const b = add(new THREE.CylinderGeometry(0.075, 0.075, 0.03, 32), glow, x, 2.98, 1.08);
+  b.rotation.x = Math.PI / 2;
+  const ring = add(new THREE.TorusGeometry(0.095, 0.012, 12, 48), brass, x, 2.98, 1.085);
+}
+// spout block + twin nozzles
+add(new RoundedBoxGeometry(0.42, 0.12, 0.34, 3, 0.05), chrome, 0, 2.42, 0.78);
+const NOZ_Y = 2.33, NOZ_Z = 0.8;
+add(new THREE.CylinderGeometry(0.035, 0.05, 0.1, 24), chrome, 0, NOZ_Y + 0.03, NOZ_Z);
+// vertical brass pinstripes on the column front
+for (const x of [-0.5, 0.5]) add(new THREE.BoxGeometry(0.02, 2.1, 0.02), brass, x, 1.4, 0.18);
+// drip tray with grille
+const TRAY_Y = 0.36;
+add(new RoundedBoxGeometry(1.25, 0.1, 1.05, 3, 0.04), darkChrome, 0, TRAY_Y - 0.05, 0.6);
+for (let i = 0; i < 9; i++) add(new THREE.BoxGeometry(1.1, 0.015, 0.05), chrome, 0, TRAY_Y + 0.005, 0.2 + i * 0.1);
+// translucent water tank at the back
+const tank = add(new RoundedBoxGeometry(1.2, 2.2, 0.5, 4, 0.1),
+  new THREE.MeshPhysicalMaterial({ color: 0xa8c4d0, roughness: 0.05, transmission: 0.9, thickness: 0.3, transparent: true, opacity: 0.35 }), 0, 1.55, -1.5);
+
+// ---------- cup + saucer
+function lathe(points, seg = 96) { return new THREE.LatheGeometry(points.map(p => new THREE.Vector2(p[0], p[1])), seg); }
+const cup = new THREE.Group(); scene.add(cup);
+const SAUCER_H = 0.035;
+add(lathe([[0, 0], [0.5, 0.005], [0.58, 0.035], [0.6, 0.05], [0.58, 0.055], [0.5, 0.03], [0.22, 0.02], [0, 0.022]]), porcelain, 0, 0, 0, cup);
+// cup body (outer + inner wall in one profile)
+const CUP_IN_BOTTOM = 0.09, CUP_TOP = 0.46;
+add(lathe([[0, 0.035], [0.17, 0.035], [0.2, 0.06], [0.27, 0.2], [0.31, 0.38], [0.32, CUP_TOP], [0.3, CUP_TOP],
+           [0.29, 0.38], [0.255, 0.2], [0.19, 0.1], [0.14, CUP_IN_BOTTOM], [0, CUP_IN_BOTTOM]]), porcelain, 0, SAUCER_H - 0.03, 0, cup);
+const handle = new THREE.Mesh(new THREE.TorusGeometry(0.1, 0.028, 16, 48, Math.PI * 1.25), porcelain);
+handle.position.set(0.33, 0.28, 0); handle.rotation.z = -Math.PI * 0.62; cup.add(handle);
+// brass rim
+add(new THREE.TorusGeometry(0.31, 0.006, 8, 96), brass, 0, CUP_TOP + SAUCER_H - 0.03, 0, cup).rotation.x = Math.PI / 2;
+
+// coffee surface inside the cup (crema)
+function cremaTexture() {
+  const s = 512, c = document.createElement('canvas'); c.width = c.height = s;
+  const g = c.getContext('2d');
+  const grd = g.createRadialGradient(s * 0.48, s * 0.5, 4, s / 2, s / 2, s / 2);
+  grd.addColorStop(0, '#a8682e'); grd.addColorStop(0.45, '#8c5022'); grd.addColorStop(0.8, '#5e3011'); grd.addColorStop(1, '#3a1a08');
+  g.fillStyle = grd; g.fillRect(0, 0, s, s);
+  // tiger-striping / micro bubbles
+  let seed = 7; const rnd = () => (seed = (seed * 16807) % 2147483647) / 2147483647;
+  for (let i = 0; i < 2600; i++) {
+    const a = rnd() * Math.PI * 2, r = Math.sqrt(rnd()) * s * 0.48;
+    g.fillStyle = `rgba(${rnd() > 0.5 ? '235,190,140' : '90,45,18'},${0.05 + rnd() * 0.12})`;
+    g.beginPath(); g.arc(s / 2 + Math.cos(a) * r, s / 2 + Math.sin(a) * r, 1 + rnd() * 3.5, 0, Math.PI * 2); g.fill();
+  }
+  const t = new THREE.CanvasTexture(c); t.colorSpace = THREE.SRGBColorSpace; return t;
+}
+const crema = new THREE.Mesh(new THREE.CircleGeometry(1, 96),
+  new THREE.MeshPhysicalMaterial({ map: cremaTexture(), roughness: 0.35, clearcoat: 0.6 }));
+crema.rotation.x = -Math.PI / 2; cup.add(crema);
+const innerR = y => { // inner radius of the cup at height y (cup space), from the lathe profile
+  const pts = [[CUP_IN_BOTTOM, 0.14], [0.1, 0.19], [0.2, 0.255], [0.38, 0.29], [CUP_TOP, 0.3]];
+  for (let i = 1; i < pts.length; i++) if (y <= pts[i][0]) {
+    const [y0, r0] = pts[i - 1], [y1, r1] = pts[i]; return r0 + (r1 - r0) * (y - y0) / (y1 - y0);
+  }
+  return 0.3;
+};
+
+// ---------- coffee streams (twin, merging slightly)
+const streams = [0].map(x => {
+  const m = new THREE.Mesh(new THREE.CylinderGeometry(0.026, 0.02, 1, 20, 1, true), coffeeMat);
+  m.userData.x = x; scene.add(m); return m;
+});
+
+// ---------- steam (soft billboards)
+function steamTexture() {
+  const s = 128, c = document.createElement('canvas'); c.width = c.height = s;
+  const g = c.getContext('2d');
+  const grd = g.createRadialGradient(s / 2, s / 2, 0, s / 2, s / 2, s / 2);
+  grd.addColorStop(0, 'rgba(255,255,255,0.55)'); grd.addColorStop(1, 'rgba(255,255,255,0)');
+  g.fillStyle = grd; g.fillRect(0, 0, s, s);
+  return new THREE.CanvasTexture(c);
+}
+const steamMat = new THREE.MeshBasicMaterial({ map: steamTexture(), transparent: true, depthWrite: false, blending: THREE.AdditiveBlending, opacity: 0 });
+const steam = [...Array(14)].map((_, i) => {
+  const m = new THREE.Mesh(new THREE.PlaneGeometry(1, 1), steamMat.clone());
+  m.userData = { phase: i / 14, dx: Math.sin(i * 12.9898) * 0.12, sway: 0.5 + (i % 5) * 0.2 };
+  scene.add(m); return m;
+});
+
+// ---------- animation
+const ease = t => t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
+const easeOut = t => 1 - Math.pow(1 - t, 3);
+const clamp = (v, a = 0, b = 1) => Math.max(a, Math.min(b, v));
+const seg = (t, a, b) => clamp((t - a) / (b - a));
+const lerp = (a, b, k) => a + (b - a) * k;
+const CUP_Z = NOZ_Z, CUP_BASE_Y = TRAY_Y + 0.01;
+
+window.renderAt = (t) => {
+  // camera: wide 3/4 orbit → settle in front → slow push-in, rising to look into the cup
+  const a = ease(seg(t, 0, 0.4)), b = ease(seg(t, 0.4, 1));
+  const ang = THREE.MathUtils.degToRad(lerp(lerp(42, 14, a), -8, b));
+  const elev = THREE.MathUtils.degToRad(lerp(lerp(12, 10, a), 24, b));
+  const dist = lerp(lerp(11.5, 10, a), 5.4, b);
+  const target = new THREE.Vector3(0, lerp(lerp(1.75, 1.6, a), 1.15, b), lerp(0, 0.35, a + b * 0.5));
+  camera.position.set(target.x + Math.sin(ang) * Math.cos(elev) * dist, target.y + Math.sin(elev) * dist, target.z + Math.cos(ang) * Math.cos(elev) * dist);
+  camera.lookAt(target);
+
+  // cup slides in from the right and settles
+  const c = easeOut(seg(t, 0.16, 0.36));
+  cup.position.set(lerp(5, 0, c), CUP_BASE_Y + Math.sin(c * Math.PI) * 0.12, CUP_Z);
+  cup.rotation.y = lerp(-0.9, 0.35, c);
+
+  // pour: stream head travels down (0.40–0.46), flows (→0.84), tail leaves the nozzle (0.84–0.9)
+  const cupBottomWorld = CUP_BASE_Y + SAUCER_H - 0.03 + CUP_IN_BOTTOM;
+  const fill = ease(seg(t, 0.45, 0.88));
+  const levelLocal = lerp(CUP_IN_BOTTOM + 0.005, CUP_TOP - 0.07, fill);
+  const levelWorld = CUP_BASE_Y + SAUCER_H - 0.03 + levelLocal;
+  const head = seg(t, 0.40, 0.46), tail = seg(t, 0.84, 0.9);
+  const topY = lerp(NOZ_Y, levelWorld, tail);
+  const botY = lerp(NOZ_Y, levelWorld, head);
+  for (const s of streams) {
+    const L = Math.max(0.0001, topY - botY);
+    s.visible = t > 0.4 && tail < 1 && L > 0.002;
+    s.scale.set(1, L, 1);
+    // streams converge slightly towards the cup
+    s.position.set(s.userData.x * lerp(1, 0.55, head), (topY + botY) / 2, CUP_Z);
+  }
+  crema.visible = fill > 0.001;
+  crema.position.y = SAUCER_H - 0.03 + levelLocal;
+  const r = innerR(levelLocal) - 0.004; crema.scale.set(r, r, 1);
+  crema.rotation.z = t * 2.5; // gentle swirl
+  cupLight.intensity = 2.5 * seg(t, 0.4, 0.7);
+
+  // steam rises once the cup is mostly full
+  const st = seg(t, 0.62, 0.95);
+  for (const m of steam) {
+    const k = (m.userData.phase + t * 3.2) % 1;
+    m.position.set(m.userData.dx + Math.sin(k * 6 + m.userData.sway * 4) * 0.08, levelWorld + 0.05 + k * 0.9, CUP_Z + Math.cos(k * 5) * 0.04);
+    const sc = 0.18 + k * 0.45; m.scale.set(sc, sc, 1);
+    m.material.opacity = st * Math.sin(k * Math.PI) * 0.22;
+    m.lookAt(camera.position);
+  }
+  renderer.render(scene, camera);
+  return true;
+};
+window.renderAt(0);
+window.ready = true;
+</script></body></html>

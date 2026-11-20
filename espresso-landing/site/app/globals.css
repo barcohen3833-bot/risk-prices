@@ -1,0 +1,47 @@
+* { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --bg: #000000;
+  --text: #ffffff;
+  --body: #e5e5e5;
+  --accent: #c8a96e;
+  --accent-hover: #e8c98e;
+  --dim: #888888;
+  --border: rgba(200, 169, 110, 0.2);
+}
+
+body {
+  background: #000; color: #fff;
+  -webkit-font-smoothing: antialiased; overflow-x: hidden;
+  font-family: var(--font-body), system-ui, sans-serif; font-weight: 300;
+}
+/* Hebrew has no capitals and suffers from wide tracking, so labels are larger and tighter than in Latin designs */
+.label {
+  font-family: var(--font-body), sans-serif; font-size: 0.8rem; letter-spacing: 0.06em;
+  text-transform: uppercase; color: var(--accent); font-weight: 500;
+}
+.display { font-family: var(--font-display), Georgia, serif; font-weight: 400; line-height: 1.15; }
+.btn {
+  display: inline-block; background: var(--accent); color: #000; text-decoration: none;
+  font-family: var(--font-body), sans-serif; font-weight: 500; font-size: 0.9rem;
+  letter-spacing: 0.04em; text-transform: uppercase; padding: 0.9rem 2.6rem;
+  pointer-events: auto; border: 1px solid var(--accent); transition: background .3s, color .3s;
+}
+.btn:hover { background: var(--accent-hover); border-color: var(--accent-hover); }
+.btn-outline:hover { background: #000; color: var(--accent); border-color: var(--accent); }
+.btn:focus-visible { outline: 2px solid var(--accent-hover); outline-offset: 4px; }
+.section { padding: clamp(5rem, 12vw, 9rem) clamp(1.25rem, 5vw, 4rem); max-width: 1200px; margin: 0 auto; }
+.features-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 3rem 2.5rem; margin-top: 4rem; }
+.feature { border-top: 1px solid var(--border); padding-top: 1.75rem; }
+.feature h3 { font-family: var(--font-body), sans-serif; font-weight: 500; font-size: 1.02rem; letter-spacing: 0.02em; color: #fff; margin: 1.25rem 0 0.75rem; }
+.feature p { color: var(--body); line-height: 1.75; font-size: 1rem; }
+.specs { width: 100%; margin-top: 3.5rem; border-collapse: collapse; }
+.specs th, .specs td { text-align: start; padding: 1.15rem 0; border-bottom: 1px solid rgba(255,255,255,0.07); vertical-align: top; }
+.specs th { width: 40%; color: var(--accent); font-weight: 500; font-size: 0.88rem; letter-spacing: 0.03em; padding-inline-end: 1.5rem; }
+.specs td { color: var(--body); font-size: 1rem; }
+.ltr { direction: ltr; unicode-bidi: isolate; }
+@media (max-width: 767px) {
+  .features-grid { grid-template-columns: 1fr; }
+  .specs th, .specs td { display: block; width: 100%; padding: 0.35rem 0; }
+  .specs th { padding-top: 1.1rem; border-bottom: 0; }
+  .specs td { padding-bottom: 1.1rem; }
+}
