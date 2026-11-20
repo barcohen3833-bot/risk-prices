@@ -1,30 +1,30 @@
 import Reveal from './Reveal';
 
 const specs: [string, string][] = [
-  ['Reference No.', 'VR-4005-RG'],
-  ['Case Diameter', '40 mm, 11.6 mm thick'],
-  ['Case Material', '18 ct rose gold, polished and satin-finished'],
-  ['Bezel', 'Fluted, 18 ct rose gold'],
-  ['Movement', 'Calibre V-3255, self-winding, 31 jewels'],
-  ['Power Reserve', 'Approximately 70 hours'],
-  ['Accuracy', '−2 / +2 seconds per day, after casing'],
-  ['Crystal', 'Domed sapphire, anti-reflective on the underside'],
-  ['Water Resistance', '100 metres / 330 feet'],
-  ['Dial', 'Chocolate sunburst, applied rose-gold indices'],
-  ['Bracelet', 'Three-piece links, concealed folding clasp'],
+  ['מספר דגם', 'VR-4005-RG'],
+  ['קוטר המארז', '40 מ״מ, עובי 11.6 מ״מ'],
+  ['חומר המארז', 'זהב אדום 18 קראט, מלוטש ומוברש'],
+  ['בזל', 'מחורץ, זהב אדום 18 קראט'],
+  ['מנגנון', 'קליבר V-3255, מילוי עצמי, 31 אבני חן'],
+  ['רזרבת כוח', 'כ-70 שעות'],
+  ['דיוק', 'עד ±2 שניות ביממה, אחרי ההרכבה במארז'],
+  ['זכוכית', 'ספיר קמור, ציפוי נגד השתקפויות בצד הפנימי'],
+  ['עמידות במים', '100 מטר'],
+  ['לוח', 'שוקולד בגימור קרני שמש, סימוני שעות מזהב אדום'],
+  ['רצועה', 'חוליות בשלוש שורות, אבזם מתקפל נסתר'],
 ];
 
 export default function SpecsSection() {
   return (
     <section className="section" aria-labelledby="specs-title" style={{ maxWidth: 960 }}>
-      <Reveal as="p" className="label">Technical Specifications</Reveal>
+      <Reveal as="p" className="label">מפרט טכני</Reveal>
       <Reveal as="h2" index={1} className="display" style={{ fontSize: 'clamp(2rem, 4vw, 3.5rem)', marginTop: '1.25rem' }}>
-        <span id="specs-title">The architecture of precision.</span>
+        <span id="specs-title">הארכיטקטורה של הדיוק.</span>
       </Reveal>
       <Reveal index={2}>
         <table className="specs">
           <caption className="label" style={{ position: 'absolute', width: 1, height: 1, overflow: 'hidden', clip: 'rect(0 0 0 0)' }}>
-            Vérane Perpétuel 40 specifications
+            המפרט של וראן פרפטואל 40
           </caption>
           <tbody>
             {specs.map(([k, v]) => (

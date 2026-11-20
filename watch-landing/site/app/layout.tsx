@@ -1,18 +1,18 @@
 import type { Metadata } from 'next';
-import { Inter, Playfair_Display } from 'next/font/google';
+import { Heebo, Frank_Ruhl_Libre } from 'next/font/google';
 import './globals.css';
 
-const inter = Inter({ subsets: ['latin'], weight: ['300', '400', '500'], variable: '--font-inter' });
-const playfair = Playfair_Display({ subsets: ['latin'], weight: ['400'], style: ['normal', 'italic'], variable: '--font-playfair' });
+const body = Heebo({ subsets: ['hebrew', 'latin'], weight: ['300', '400', '500'], variable: '--font-body' });
+const display = Frank_Ruhl_Libre({ subsets: ['hebrew', 'latin'], weight: ['400', '500'], variable: '--font-display' });
 
 export const metadata: Metadata = {
-  title: 'Vérane Perpétuel 40',
-  description: 'Vérane Perpétuel 40 in rose gold with a chocolate sunburst dial. Geneva, since 1905.',
+  title: 'וראן פרפטואל 40',
+  description: 'וראן פרפטואל 40 בזהב אדום עם לוח שוקולד מבריק. ז׳נבה, מאז 1905.',
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" className={`${inter.variable} ${playfair.variable}`}>
+    <html lang="he" dir="rtl" className={`${body.variable} ${display.variable}`}>
       <body>{children}</body>
     </html>
   );

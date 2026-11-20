@@ -24,8 +24,9 @@ scene.environment = pmrem.fromScene(new RoomEnvironment(), 0.04).texture;
 scene.environmentIntensity = 0.9;
 
 const camera = new THREE.PerspectiveCamera(30, W / H, 0.1, 100);
-// shift the watch to the right third so the hero copy (bottom-left) never covers it
-camera.setViewOffset(W, H, -Math.round(W * 0.14), 0, W, H);
+// shift the watch sideways so the hero copy never covers it (?shift=0.14 → right, -0.14 → left)
+const SHIFT = P.has("shift") ? +P.get("shift") : -0.14;
+camera.setViewOffset(W, H, -Math.round(W * SHIFT), 0, W, H);
 
 // lights: rim + key, keep background pure black
 const key = new THREE.DirectionalLight(0xfff1dc, 2.2); key.position.set(4, 6, 8); scene.add(key);

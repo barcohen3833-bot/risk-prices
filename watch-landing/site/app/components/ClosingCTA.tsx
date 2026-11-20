@@ -9,12 +9,12 @@ export default function ClosingCTA() {
       aria-labelledby="cta-title"
       style={{ width: '100%', background: '#000', textAlign: 'center', padding: 'clamp(6rem, 14vw, 11rem) 1.25rem', position: 'relative', overflow: 'hidden' }}
     >
-      <Reveal as="p" className="label">Yours to Command</Reveal>
+      <Reveal as="p" className="label">שלך לגמרי</Reveal>
       <Reveal as="h2" index={1} className="display" style={{ fontSize: 'clamp(2.2rem, 5vw, 4.5rem)', margin: '1.5rem auto 1.5rem' }}>
-        <span id="cta-title">A century of mastery.<br /><em style={{ color: '#E5E5E5' }}>One expression of it.</em></span>
+        <span id="cta-title">מאה שנים של אומנות.<br /><em style={{ color: '#E5E5E5' }}>ביטוי אחד שלה.</em></span>
       </Reveal>
       <Reveal as="p" index={2} style={{ fontWeight: 300, color: '#E5E5E5', maxWidth: 480, margin: '0 auto 3rem', lineHeight: 1.7 }}>
-        Each Perpétuel 40 is fitted to its owner by hand. Visit an authorised retailer to try it on and arrange your fitting.
+        כל פרפטואל 40 מותאם ביד לבעליו. בואו לאחד המשווקים המורשים שלנו כדי למדוד אותו ולתאם התאמה אישית.
       </Reveal>
       <Reveal index={3} style={{ position: 'relative', display: 'inline-block' }}>
         <div
@@ -28,7 +28,7 @@ export default function ClosingCTA() {
           whileHover={{ scale: 1.03 }}
           whileTap={{ scale: 0.98 }}
         >
-          Find an Authorised Retailer
+          למציאת משווק מורשה
         </motion.a>
       </Reveal>
     </section>

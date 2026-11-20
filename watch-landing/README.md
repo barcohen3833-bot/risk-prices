@@ -1,4 +1,4 @@
-# Vérane Perpétuel 40 – דף נחיתה עם סרטון שנשלט בגלילה
+# וראן פרפטואל 40 – דף נחיתה בעברית עם סרטון שנשלט בגלילה
 
 הדגמה של המדריך "Build $5K Websites Using Claude Code". מותג השעון (Vérane) בדיוני.
 
@@ -19,11 +19,11 @@ node relativize.mjs  # (לא חובה) נתיבים יחסיים, כדי שהא�
 ## יצירת סרטון מחדש
 ```bash
 cd render && npm install
-node capture.mjs ../png 144 1920 1080
+node capture.mjs ../png 144 1920 1080   # שעון בצד שמאל; לאתר באנגלית: לפתוח scene.html עם ?shift=0.14
 ffmpeg -framerate 24 -i ../png/f_%04d.png -c:v libx264 -pix_fmt yuv420p -crf 18 hero.mp4
 ffmpeg -i hero.mp4 -vf "fps=24,scale=1920:-1" -q:v 3 ../frames/frame_%04d.jpg
 cp -r ../frames ../site/public/frames   # ולעדכן FRAME_COUNT ב-site/app/frames.ts
 ```
 
 ## התאמה ללקוח
-מחליפים את הסרטון בסרטון של המוצר על רקע שחור (למשל מ-Higgsfield או Kling), מחלצים פריימים, מעדכנים `FRAME_COUNT`, ומשנים טקסטים ב-`site/app/components/`. אם המוצר בסרטון לא נמצא ב-61% מרוחב הפריים, לעדכן `WATCH_X` ב-`ScrollHero.tsx`.
+מחליפים את הסרטון בסרטון של המוצר על רקע שחור (למשל מ-Higgsfield או Kling), מחלצים פריימים, מעדכנים `FRAME_COUNT`, ומשנים טקסטים ב-`site/app/components/`. השעון ממוקם בצד שמאל של הפריים (39% מהרוחב) כי הטקסט בעברית מיושר לימין. אם המוצר בסרטון של הלקוח במקום אחר, לעדכן `WATCH_X` ב-`ScrollHero.tsx`.
