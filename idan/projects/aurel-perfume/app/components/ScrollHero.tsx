@@ -91,7 +91,7 @@ export default function ScrollHero() {
             {product.tagline}
           </motion.p>
           <motion.div {...fade(3)}>
-            <BuyButton showIcons={false} />
+            <BuyButton />
           </motion.div>
         </div>
       </div>

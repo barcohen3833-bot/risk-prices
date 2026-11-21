@@ -12,7 +12,7 @@ a{color:inherit}
 .display{font-family:var(--font-frank),var(--font-playfair),serif;font-weight:400}
 .latin{font-family:var(--font-playfair),serif}
 .btn{display:inline-flex;align-items:center;gap:.6rem;background:var(--accent);color:#000;border:1px solid var(--accent);
-  font-family:var(--font-heebo);font-weight:500;font-size:.8rem;letter-spacing:.18em;text-transform:uppercase;
+  font-family:var(--font-heebo);font-weight:500;font-size:.9rem;letter-spacing:.06em;text-transform:uppercase;
   padding:.95rem 2.6rem;text-decoration:none;cursor:pointer;transition:background .25s,color .25s;pointer-events:auto}
 .btn:hover{background:var(--accent-hover);border-color:var(--accent-hover)}
 .btn-ghost{background:transparent;color:var(--accent)}
@@ -20,5 +20,4 @@ a{color:inherit}
 .btn:focus-visible{outline:2px solid #fff;outline-offset:3px}
 .section{padding:clamp(5rem,10vw,9rem) clamp(1.25rem,5vw,4rem);max-width:1200px;margin:0 auto}
 .pay-icons{display:flex;gap:.5rem;align-items:center;justify-content:center;flex-wrap:wrap;margin-top:1rem;color:var(--dim);font-size:.8rem}
-.pay-icons span{border:1px solid rgba(255,255,255,.15);border-radius:4px;padding:.25rem .55rem;color:var(--body);font-weight:400}
 @media (max-width:767px){.grid-features{grid-template-columns:1fr!important}.spec-row{grid-template-columns:1fr!important;gap:.25rem!important}}
